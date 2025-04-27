@@ -50,34 +50,7 @@ class hopeFoundationCancerDatabase(object):
         else:
             return np.nan
 
-    def clean_payment_method(self,df):
-
-        payment_map = {
-            r'(?i)check': 'CK',
-            r'(?i)ck': 'CK',
-            r'(?i)gc': 'GC',
-            r'(?i)cc': 'CC',
-            r'(?i)EFT': 'CK',
-            r'(?i)ACH': 'CK'
-
-        }
-
-        def update_pm_notes(row):
-            original_value = row['Payment Method']
-            # Loop through the mapping and check for matches
-            if (not pd.isna(original_value)):
-                row['Payment Method'] = 'other'
-                for pattern, value in payment_map.items():
-                    if re.search(pattern, str(original_value)):
-                        row['Payment Method'] = value
-                        row['Notes'] = f"{row['Notes']} - {original_value}"
-                        break  # Stop once a match is found
-                   
-            return row
-
-        return df.apply(update_pm_notes, axis=1)       
-
-    def remap_column(self,df,map,column_name):
+    def remap_column(self,df,column_name,map):
         if (not isinstance(map, dict)):
             raise Exception("Not a dictionary")
         if ( not column_name in df.columns):
@@ -106,39 +79,14 @@ class hopeFoundationCancerDatabase(object):
                 if updated:
                     if 'save_orig' in map: 
                         if map['save_orig']['column_name'] in df.columns:
-                            row[column_name] = f"{row[column_name]} - {original_value}"
+                            row[map['save_orig']['column_name']] = f"{row[map['save_orig']['column_name']]} - {column_name}: {original_value}"
+                            #print(f"{map['save_orig']['column_name']} - being updated to {original_value}")
+                        else:
+                            raise Exception("Column not found in DF")
 
             return row
 
         return df.apply(update_row, axis=1)  
-
-
-
-    def clean_patient_letter_notified(self,df):
-
-        payment_map = {
-            r'(?i)Yes': 'Yes',
-            r'(?i)no': 'No',
-            r'(?i)na': 'No',
-            r'(?i)HOLD': 'No'
-        }
-        
-    
-        def update_patient_letter_notified(row):
-            original_value = row['Patient Letter Notified? (Directly/Indirectly through rep)']
-            # Loop through the mapping and check for matches
-            if (not pd.isna(original_value)):
-                if pd.to_datetime(row['Patient Letter Notified? (Directly/Indirectly through rep)'], errors='coerce') is not pd.NaT:
-                    row['Patient Letter Notified? (Directly/Indirectly through rep)'] = 'Yes'
-                else:
-                    for pattern, value in payment_map.items():
-                        if re.search(pattern, str(original_value)):
-                            row['Patient Letter Notified? (Directly/Indirectly through rep)'] = value
-                            break  # Stop once a match is found
-                   
-            return row
-
-        return df.apply(update_patient_letter_notified, axis=1)  
 
 
     def load_db(self,url):
@@ -147,7 +95,11 @@ class hopeFoundationCancerDatabase(object):
 
     def replace_whitespace_with_nan(self,df):
         # Apply a function to each cell to check for whitespace or empty strings and replace with NaN
-        df = df.apply(lambda x: np.nan if isinstance(x, str) and x.strip() == '' else x)
+        df = df.map(lambda x: np.nan if isinstance(x, str) and x.strip() == '' else x)
+        return df
+
+    def trim_whitespace(self,df):
+        df = df.map(lambda x: x.strip() if isinstance(x, str) else x)
         return df
 
     def validate_values(self,df, column_name, valid_values):
@@ -167,6 +119,8 @@ class hopeFoundationCancerDatabase(object):
         df = df.replace(r'(?i)yes', 'Yes', regex=True)
         df = df.replace(r'(?i)no', 'No', regex=True)
         df = self.replace_whitespace_with_nan(df)
+        df = self.trim_whitespace(df)
+
         df['Patient ID#'] = df['Patient ID#'].astype(int)
         df['Grant Req Date'] = pd.to_datetime(df['Grant Req Date'])
         df['App Year'] = df['App Year'].astype(int)
@@ -183,11 +137,11 @@ class hopeFoundationCancerDatabase(object):
             },
             'date_ref': 'Yes',
             'save_orig': {
-                'column_name' : 'notes'
+                'column_name' : 'Notes'
             }
         }
         #df['Payment Submitted?'] = df['Payment Submitted?'].apply(lambda x: 'yes' if str(x).lower() == 'yes' or pd.to_datetime(x, errors='coerce') is not pd.NaT else 'no')
-        df = self.remap_column(df,payment_map,'Payment Submitted?')
+        df = self.remap_column(df,'Payment Submitted?',payment_map)
 
 
         df['Pt Zip'] =  df['Pt Zip'].apply(self.clean_zip)
@@ -203,10 +157,111 @@ class hopeFoundationCancerDatabase(object):
             },
             'valid_others': 'other'
         }
-        df = self.remap_column(df,payment_type_map,'Payment Method')
+        df = self.remap_column(df,'Payment Method',payment_type_map)
         #df = self.clean_payment_method(df)
 
-        df = self.clean_patient_letter_notified(df)
+        patient_notification_map ={
+            'valid_vals': {
+                r'(?i)Yes': 'Yes',
+                r'(?i)no': 'No',
+                r'(?i)na': 'No',
+                r'(?i)HOLD': 'No'
+            },
+            'date_ref': 'Yes'
+        }
+        df = self.remap_column(df,'Patient Letter Notified? (Directly/Indirectly through rep)',patient_notification_map)
+
+        language_map ={
+            'valid_vals': {
+                r'(?i)english': 'English',
+                r'(?i)spanish': 'Spanish'
+            },
+            'valid_others': 'other',            
+            'save_orig': {
+                'column_name' : 'Notes'
+            }
+
+        }
+        df = self.remap_column(df,'Language',language_map)
+        
+        marital_status_map ={
+            'valid_vals': {
+                r'(?i)Single': 'Single',
+                r'(?i)Married': 'Married',
+                r'(?i)Divorced': 'Divorced',
+                r'(?i)Separated': 'Separated',
+                r'(?i)Domestic Partnership': 'Domestic Partnership'
+            },
+            'valid_others': 'other'
+
+        }
+        df = self.remap_column(df,'Marital Status',marital_status_map)
+
+        gender_map ={
+            'valid_vals': {
+                r'(?i)Male': 'Male',
+                r'(?i)Female': 'Female',
+                r'(?i)Transgender Male': 'Transgender Male',
+                r'(?i)Non-Binary': 'Non-Binary',
+                r'(?i)Another Gender Identity': 'Another Gender Identity',
+                r'(?i)Decline to Answer': 'Decline to Answer'
+            },
+            'valid_others': 'other'
+        }
+        df = self.remap_column(df,'Gender',gender_map)
+
+        race_ethnicity_map = {
+            'valid_vals': {
+                r'(?i)American Indian or Alaskan Native': 'American Indian or Alaskan Native',
+                r'(?i)American Indian or Alaksa Native': 'American Indian or Alaskan Native',
+                r'(?i)American Indian or Alaska Native': 'American Indian or Alaskan Native',
+                r'(?i)Asian': 'Asian',
+                r'(?i)Black or African American': 'Black or African American',
+                r'(?i)Native Hawaiian or Other Pacific Islander': 'Native Hawaiian or Other Pacific Islander',
+                r'(?i)White': 'White',
+                r'(?i)Whiate': 'White',
+                r'(?i)Decline to Answer': 'Decline to Answer',
+                r'(?i)Two or more races': 'Two or more races',
+            },
+            'valid_others': 'other'
+        }
+        df = self.remap_column(df,'Race',race_ethnicity_map)
+
+        hispanic_map= {
+            'valid_vals': {
+                r'(?i)^No$': 'No',
+                r'(?i)^Yes$': 'Yes',
+                r'(?i)^Non-Hispanic or Latino$': 'No',
+                r'(?i)^Non-Hispanic$': 'No',
+                r'(?i)^Non-hispanic latino$': 'No',
+                r'(?i)^Decline to answer$': 'Decline to Answer',
+                r'(?i)^Hispanic or Latino$': 'Yes',
+                r'(?i)^Hispanic of Latino$': 'Yes',
+            }
+        }
+        df = self.remap_column(df,'Hispanic/Latino',hispanic_map)
+
+
+        sexual_orientation_map = {
+            'valid_vals': {
+                r'(?i)^Heterosexual$': 'Heterosexual',
+                r'(?i)^Straight$': 'Heterosexual',
+                r'(?i)^Stright$': 'Heterosexual',
+                r'(?i)^Staight$': 'Heterosexual',
+                r'(?i)^Striaght$': 'Heterosexual',
+                r'(?i)^straight$': 'Heterosexual',
+                r'(?i)^Male$': 'Male',
+                r'(?i)^Female$': 'Female',
+                r'(?i)^Decline to answer$': 'Decline to Answer',
+                r'(?i)^Decline$': 'Decline to Answer',
+                r'(?i)^Gay or lesbian$': 'Gay or Lesbian',
+                r'(?i)^Queer$': 'Queer',
+                r'(?i)^Bisexual$': 'Bisexual',
+                r"(?i)^I don't know$": "I don't know",
+                r'(?i)^Something else': 'Something else'
+            }
+        }
+        df = self.remap_column(df,'Sexual Orientation',sexual_orientation_map)
 
         return df
 
