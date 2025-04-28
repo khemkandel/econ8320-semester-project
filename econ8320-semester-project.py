@@ -12,7 +12,7 @@ import sys
 
 
 # List of required packages
-required_packages = ['pgeocode', 'openpyxl', 'pandas','numpy','re']
+required_packages = ['pgeocode', 'openpyxl', 'pandas','numpy','re','operator']
 
 # Function to install missing packages
 def install(package):
@@ -32,6 +32,7 @@ import pandas as pd
 import numpy as np
 import pgeocode
 import re
+import operator
 
 class hopeFoundationCancerDatabase(object):
 
@@ -83,6 +84,10 @@ class hopeFoundationCancerDatabase(object):
                             #print(f"{map['save_orig']['column_name']} - being updated to {original_value}")
                         else:
                             raise Exception("Column not found in DF")
+            else:
+                if 'NaN_map' in map: 
+                     row[column_name] = map['NaN_map']
+
 
             return row
 
@@ -114,10 +119,64 @@ class hopeFoundationCancerDatabase(object):
         df[column_name] = df[column_name].apply(lambda x: x if x in valid_values else np.nan)
         return df
 
+    def clean_currency_column(self, df, column_name):
+        """
+        Cleans up a currency column:
+        - Removes dollar signs, commas, spaces, etc.
+        - Converts to float
+        - Handles missing or invalid values gracefully
+        """
+        if column_name not in df.columns:
+            raise Exception(f"Column '{column_name}' not found in DataFrame")
+        
+        def clean_value(val):
+            if pd.isna(val):
+                return np.nan
+            
+            if bool(re.search(r'\d.*[a-zA-Z]|[a-zA-Z].*\d', str(val))):
+                return np.nan  # Return NaN if mixed text and numbers\
+
+            # Remove anything that is not a digit, period or minus sign
+            val = re.sub(r'[^\d\.\-]', '', str(val))
+            try:
+                return float(val)
+            except ValueError:
+                return np.nan
+        
+        df[column_name] = df[column_name].apply(clean_value)
+        return df
+
+    def clean_and_convert_to_float(self, df, column_name):
+        """
+        Cleans up a column by:
+        - Removing non-numeric characters (e.g., dollar signs, commas).
+        - Converts the column values to float.
+        - Handles invalid or missing values by converting them to NaN.
+        """
+        if column_name not in df.columns:
+            raise Exception(f"Column '{column_name}' not found in DataFrame")
+        
+        def clean_value(val):
+            if pd.isna(val):
+                return np.nan
+
+            if bool(re.search(r'\d.*[a-zA-Z]|[a-zA-Z].*\d', str(val))):
+                return np.nan  # Return NaN if mixed text and numbers
+
+            # Remove any non-numeric characters except for decimal point and minus sign
+            val = re.sub(r'[^\d\.\-]', '', str(val))
+            try:
+                return float(val)
+            except ValueError:
+                return np.nan
+        
+        df[column_name] = df[column_name].apply(clean_value)
+        return df
+
     def clean_datafile(self,df):
-        df = df.replace(r'(?i)missing', np.nan, regex=True)
-        df = df.replace(r'(?i)yes', 'Yes', regex=True)
-        df = df.replace(r'(?i)no', 'No', regex=True)
+        df = df.replace(r'(?i)^missing$', np.nan, regex=True)
+        df = df.replace(r'(?i)^yes$', 'Yes', regex=True)
+        df = df.replace(r'(?i)^no$', 'No', regex=True)
         df = self.replace_whitespace_with_nan(df)
         df = self.trim_whitespace(df)
 
@@ -128,7 +187,6 @@ class hopeFoundationCancerDatabase(object):
                 
         valid_requst_status = ['Approved', 'Pending', 'Denied']
         df = self.validate_values(df,'Request Status',valid_requst_status)
-        #df['Request Status'] = df['Request Status'].where(df['Request Status'].isin(valid_requst_status))
 
         payment_map = {
             'valid_vals' : {
@@ -136,11 +194,11 @@ class hopeFoundationCancerDatabase(object):
                 r'(?i)no': 'No'
             },
             'date_ref': 'Yes',
+            'NaN_map': 'Missing',
             'save_orig': {
                 'column_name' : 'Notes'
             }
         }
-        #df['Payment Submitted?'] = df['Payment Submitted?'].apply(lambda x: 'yes' if str(x).lower() == 'yes' or pd.to_datetime(x, errors='coerce') is not pd.NaT else 'no')
         df = self.remap_column(df,'Payment Submitted?',payment_map)
 
 
@@ -155,28 +213,19 @@ class hopeFoundationCancerDatabase(object):
                 r'(?i)EFT': 'CK',
                 r'(?i)ACH': 'CK'
             },
-            'valid_others': 'other'
+            'valid_others': 'other',
+            'NaN_map': 'Missing'
         }
         df = self.remap_column(df,'Payment Method',payment_type_map)
-        #df = self.clean_payment_method(df)
 
-        patient_notification_map ={
-            'valid_vals': {
-                r'(?i)Yes': 'Yes',
-                r'(?i)no': 'No',
-                r'(?i)na': 'No',
-                r'(?i)HOLD': 'No'
-            },
-            'date_ref': 'Yes'
-        }
-        df = self.remap_column(df,'Patient Letter Notified? (Directly/Indirectly through rep)',patient_notification_map)
 
         language_map ={
             'valid_vals': {
                 r'(?i)english': 'English',
                 r'(?i)spanish': 'Spanish'
             },
-            'valid_others': 'other',            
+            'valid_others': 'other',
+            'NaN_map': 'Missing',            
             'save_orig': {
                 'column_name' : 'Notes'
             }
@@ -192,7 +241,8 @@ class hopeFoundationCancerDatabase(object):
                 r'(?i)Separated': 'Separated',
                 r'(?i)Domestic Partnership': 'Domestic Partnership'
             },
-            'valid_others': 'other'
+            'valid_others': 'other',
+            'NaN_map': 'Missing'
 
         }
         df = self.remap_column(df,'Marital Status',marital_status_map)
@@ -206,7 +256,8 @@ class hopeFoundationCancerDatabase(object):
                 r'(?i)Another Gender Identity': 'Another Gender Identity',
                 r'(?i)Decline to Answer': 'Decline to Answer'
             },
-            'valid_others': 'other'
+            'valid_others': 'other',
+            'NaN_map': 'Missing'
         }
         df = self.remap_column(df,'Gender',gender_map)
 
@@ -223,7 +274,8 @@ class hopeFoundationCancerDatabase(object):
                 r'(?i)Decline to Answer': 'Decline to Answer',
                 r'(?i)Two or more races': 'Two or more races',
             },
-            'valid_others': 'other'
+            'valid_others': 'other',
+            'NaN_map': 'Missing'
         }
         df = self.remap_column(df,'Race',race_ethnicity_map)
 
@@ -237,21 +289,22 @@ class hopeFoundationCancerDatabase(object):
                 r'(?i)^Decline to answer$': 'Decline to Answer',
                 r'(?i)^Hispanic or Latino$': 'Yes',
                 r'(?i)^Hispanic of Latino$': 'Yes',
-            }
+            },
+            'NaN_map': 'Missing'
         }
         df = self.remap_column(df,'Hispanic/Latino',hispanic_map)
 
 
         sexual_orientation_map = {
             'valid_vals': {
-                r'(?i)^Heterosexual$': 'Heterosexual',
-                r'(?i)^Straight$': 'Heterosexual',
-                r'(?i)^Stright$': 'Heterosexual',
-                r'(?i)^Staight$': 'Heterosexual',
-                r'(?i)^Striaght$': 'Heterosexual',
-                r'(?i)^straight$': 'Heterosexual',
-                r'(?i)^Male$': 'Male',
-                r'(?i)^Female$': 'Female',
+                r'(?i)^Heterosexual$': 'Straight',
+                r'(?i)^Straight$': 'Straight',
+                r'(?i)^Stright$': 'Straight',
+                r'(?i)^Staight$': 'Straight',
+                r'(?i)^Striaght$': 'Straight',
+                r'(?i)^straight$': 'Straight',
+                r'(?i)^Male$': 'Straight',
+                r'(?i)^Female$': 'Straight',
                 r'(?i)^Decline to answer$': 'Decline to Answer',
                 r'(?i)^Decline$': 'Decline to Answer',
                 r'(?i)^Gay or lesbian$': 'Gay or Lesbian',
@@ -259,9 +312,82 @@ class hopeFoundationCancerDatabase(object):
                 r'(?i)^Bisexual$': 'Bisexual',
                 r"(?i)^I don't know$": "I don't know",
                 r'(?i)^Something else': 'Something else'
-            }
+            },
+            'NaN_map': 'Missing'
         }
         df = self.remap_column(df,'Sexual Orientation',sexual_orientation_map)
+
+
+        insurance_type_map = {
+            'valid_vals': {
+                r'(?i)^Uninsured$': 'Uninsured',
+                r'(?i)^Uninsurred$': 'Uninsured',
+                r'(?i)^Unisured$': 'Uninsured',
+                r'(?i)^Medicare$': 'Medicare',
+                r'(?i)^MEdicare$': 'Medicare',
+                r'(?i)^Medicaid$': 'Medicaid',
+                r'(?i)^medicaid$': 'Medicaid',
+                r'(?i)^Medicare & Medicaid$': 'Medicare & Medicaid',
+                r'(?i)^Medicaid & Medicare$': 'Medicare & Medicaid',
+                r'(?i)^Medicare & Other$': 'Medicare & Other',
+                r'(?i)^Medicare & Private$': 'Medicare & Private',
+                r'(?i)^Private$': 'Private',
+                r'(?i)^Military Program$': 'Military Program',
+                r'(?i)^Heathcare.gov$': 'Unknown',
+                r'(?i)^Unknown$': 'Unknown',
+            },
+            'NaN_map': 'Missing'
+        }
+        df = self.remap_column(df,'Insurance Type',insurance_type_map)
+
+        df['Household Size'] = df['Household Size'].astype('Int64')
+
+        df = self.clean_currency_column(df,'Total Household Gross Monthly Income')
+        df['Total Household Gross Monthly Income'] = df['Total Household Gross Monthly Income'].astype('Float64')
+
+        df = self.clean_and_convert_to_float(df, 'Distance roundtrip/Tx')
+        df['Distance roundtrip/Tx'] = df['Distance roundtrip/Tx'].astype('Float64')
+
+        expense_category_map = {
+            'valid_vals': {
+                r'(?i)^Medical Supplies/Prescription Co-pay(s)$': 'Medical Supplies/Prescription Co-pay(s)',
+                r'(?i)^Food/Groceries$': 'Food/Groceries',
+                r'(?i)^Gas$': 'Gas',
+                r'(?i)^Other$': 'Other',
+                r'(?i)^Hotel$': 'Hotel',
+                r'(?i)^Housing$': 'Housing',
+                r'(?i)^Utilities$': 'Utilities',
+                r'(?i)^Car Payment$': 'Car Payment',
+                r'(?i)^Phone/Internet$': 'Phone/Internet',
+                r'(?i)^utilities$': 'Utilities'  # Standardize "utilities" case
+            },
+            'valid_others': 'Other'
+        }
+        df = self.remap_column(df,'Type of Assistance (CLASS)',expense_category_map)
+
+        df = self.clean_and_convert_to_float(df, 'Amount') 
+
+        patient_notification_map ={
+            'valid_vals': {
+                r'(?i)Yes': 'Yes',
+                r'(?i)no': 'No',
+                r'(?i)na': 'No',
+                r'(?i)HOLD': 'No'
+            },
+            'date_ref': 'Yes'
+        }
+        df = self.remap_column(df,'Patient Letter Notified? (Directly/Indirectly through rep)',patient_notification_map)
+
+        application_signed_map ={
+            'valid_vals': {
+                r'(?i)Yes': 'Yes',
+                r'(?i)no': 'No',
+                r'(?i)na': 'No'
+            },
+            'date_ref': 'Yes',
+            'NaN_map': 'Missing'
+        }
+        df = self.remap_column(df,'Application Signed?',application_signed_map)
 
         return df
 
@@ -270,6 +396,46 @@ class hopeFoundationCancerDatabase(object):
         self.database_orig = self.load_db(url)
         self.database_clean = self.clean_datafile(self.database_orig)
 
+
+    def subset_df(self, column, condition, op='=='):
+        """
+        Return the rows of df where df[column] meets the given condition.
+
+        Parameters
+        ----------
+        df : pandas.DataFrame
+        column : str
+            The column to test.
+        condition : scalar or callable
+            • If scalar: compare df[column] to this value using operator `op`.
+            • If callable: should accept a Series and return a boolean Series.
+        op : str, one of ['==','!=','>','>=','<','<='], default '=='
+            The comparison operator to use when condition is a scalar.
+
+        Returns
+        -------
+        pandas.DataFrame
+            Subset of df where the condition holds.
+        """
+        df = self.database_clean
+        # If user passed a function, just apply it
+        if callable(condition):
+            mask = condition(df[column])
+        else:
+            # map operator string to actual function
+            ops = {
+                '==': operator.eq,
+                '!=': operator.ne,
+                '>':  operator.gt,
+                '>=': operator.ge,
+                '<':  operator.lt,
+                '<=': operator.le,
+            }
+            if op not in ops:
+                raise ValueError(f"Unsupported operator {op!r}, choose from {list(ops)}")
+            mask = ops[op](df[column], condition)
+        
+        return df.loc[mask]
 
     # def __repr__(self):
     #     print(self.database)
