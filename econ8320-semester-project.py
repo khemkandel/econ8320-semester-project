@@ -1,5 +1,7 @@
 #pip install openpyxl
 #pip install pgeocode
+#function prompt { "$(Split-Path -Leaf (Get-Location))> " }
+
 import subprocess
 import sys
 
@@ -12,7 +14,7 @@ import sys
 
 
 # List of required packages
-required_packages = ['pgeocode', 'openpyxl', 'pandas','numpy','re','operator']
+required_packages = ['pgeocode', 'openpyxl', 'pandas','numpy','re','operator','streamlit']
 
 # Function to install missing packages
 def install(package):
@@ -34,6 +36,7 @@ import pgeocode
 import re
 import operator
 from difflib import get_close_matches
+import streamlit as st
 
 class hopeFoundationCancerDatabase(object):
 
@@ -441,14 +444,26 @@ class hopeFoundationCancerDatabase(object):
             if op not in ops:
                 raise ValueError(f"Unsupported operator {op!r}, choose from {list(ops)}")
             mask = ops[op](df[column], condition)
-        
+            
         return df.loc[mask]
 
     # def __repr__(self):
     #     print(self.database)
-
+    def show_message(self):
+        st.write("This is a helper message!")
 
 url="./UNO Service Learning Data Sheet De-Identified Version.xlsx"
 db = hopeFoundationCancerDatabase(url)
 data_o = db.database_orig
 data_c = db.database_clean
+
+df = db.subset_df(column='Request Status',condition="Approved",op='==')
+# Dropdown to select a category
+category_options = df['Application Signed?'].unique()
+selected_category = st.selectbox("Filter by Category", category_options)
+
+# Filter the DataFrame
+filtered_df = df[df['Application Signed?'] == selected_category]
+
+# Display the filtered DataFrame
+st.dataframe(filtered_df)
