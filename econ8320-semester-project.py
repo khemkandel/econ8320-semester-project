@@ -33,6 +33,7 @@ import numpy as np
 import pgeocode
 import re
 import operator
+from difflib import get_close_matches
 
 class hopeFoundationCancerDatabase(object):
 
@@ -72,8 +73,14 @@ class hopeFoundationCancerDatabase(object):
                         row[column_name] = value
                         updated = True
                         break  # Stop once a match is found
+
                 if not updated:
-                    if 'valid_others' in map:
+                    valid_list = list(set(map['valid_vals'].values()))
+                    matched_val = get_close_matches(str(row[column_name]), valid_list, n=1, cutoff=.8)
+                    if (matched_val):
+                        row[column_name] = matched_val[0]
+                        updated = True
+                    elif 'valid_others' in map:
                         row[column_name] = map['valid_others']
                         updated = True
 
