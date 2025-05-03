@@ -200,7 +200,6 @@ class hopeFoundationCancerDatabase(object):
         df = self.validate_values(df,'Request Status',valid_requst_status)
 
         df['Payment Date'] = pd.to_datetime(df['Payment Submitted?'], errors='coerce')
-        df['Payment Date'] = df['Payment Date'].apply(lambda x: 'missing' if pd.isna(pd.to_datetime(x, errors='coerce')) else pd.to_datetime(x, errors='coerce'))
 
 
         payment_map = {
@@ -424,7 +423,7 @@ class hopeFoundationCancerDatabase(object):
         condition : scalar or callable
             • If scalar: compare df[column] to this value using operator `op`.
             • If callable: should accept a Series and return a boolean Series.
-        op : str, one of ['==','!=','>','>=','<','<='], default '=='
+        op : str, one of ['==','!=','>','>=','<','<=','isna','notna'], default '=='
             The comparison operator to use when condition is a scalar.
 
         Returns
@@ -433,11 +432,11 @@ class hopeFoundationCancerDatabase(object):
             Subset of df where the condition holds.
         """
         df = self.database_clean
-        # If user passed a function, just apply it
+
         if callable(condition):
             mask = condition(df[column])
         else:
-            # map operator string to actual function
+            # operator mapping
             ops = {
                 '==': operator.eq,
                 '!=': operator.ne,
@@ -445,11 +444,18 @@ class hopeFoundationCancerDatabase(object):
                 '>=': operator.ge,
                 '<':  operator.lt,
                 '<=': operator.le,
+                'isna': pd.Series.isna,
+                'notna': pd.Series.notna,
             }
+
             if op not in ops:
                 raise ValueError(f"Unsupported operator {op!r}, choose from {list(ops)}")
-            mask = ops[op](df[column], condition)
-            
+
+            if op in ['isna', 'notna']:
+                mask = ops[op](df[column])  # no condition needed
+            else:
+                mask = ops[op](df[column], condition)
+
         return df.loc[mask]
 
     # def __repr__(self):
@@ -500,7 +506,7 @@ st.dataframe(df_filtered_demography)
 
 #Create a page showing how long it takes between when we receive a patient request and actually send support.
 df_columns = ['Race','Gender','Insurance Type','Grant Req Date','Payment Date']
-df = db.subset_df(column='Payment Date',condition='NaN',op='!=')[df_columns] 
+df = db.subset_df(column='Payment Date',condition='', op='notna')[df_columns] 
 df['DaysTillPaid']  =  (df['Payment Date'] - df['Grant Req Date'])
 
 
