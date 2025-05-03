@@ -1,6 +1,7 @@
 #pip install openpyxl
 #pip install pgeocode
 #function prompt { "$(Split-Path -Leaf (Get-Location))> " }
+#python -m streamlit run .\econ8320-semester-project.py
 
 import subprocess
 import sys
@@ -197,6 +198,10 @@ class hopeFoundationCancerDatabase(object):
                 
         valid_requst_status = ['Approved', 'Pending', 'Denied']
         df = self.validate_values(df,'Request Status',valid_requst_status)
+
+        df['Payment Date'] = pd.to_datetime(df['Payment Submitted?'], errors='coerce')
+        df['Payment Date'] = df['Payment Date'].apply(lambda x: 'missing' if pd.isna(pd.to_datetime(x, errors='coerce')) else pd.to_datetime(x, errors='coerce'))
+
 
         payment_map = {
             'valid_vals' : {
@@ -457,6 +462,9 @@ db = hopeFoundationCancerDatabase(url)
 data_o = db.database_orig
 data_c = db.database_clean
 
+#Create a page showing all of the applications that are "ready for review", and 
+# can be filtered by whether or not the application has been signed by the necessary committee members.
+
 df = db.subset_df(column='Request Status',condition="Approved",op='==')
 # Dropdown to select a category
 category_options = df['Application Signed?'].unique()
@@ -467,3 +475,36 @@ filtered_df = df[df['Application Signed?'] == selected_category]
 
 # Display the filtered DataFrame
 st.dataframe(filtered_df)
+
+
+
+#Create a page answering "how much support do we give, based on location, gender, income size, insurance type, age, etc". 
+#In other words, break out how much support is offered by the listed demographics.
+
+category_options = ['Race','Gender','Insurance Type']
+selected_category = st.selectbox("Main Filter Category", category_options,index=0)
+
+sub_category_options = db.database_clean[selected_category].unique()
+selected_sub_category = st.selectbox("Sub Category", sub_category_options,index=0)
+
+df_columns = category_options.copy()
+df_columns.append('Amount')
+df = db.subset_df(column='Amount',condition=0,op='>')[df_columns] 
+
+df_columns_groupby = [selected_category]
+df_columns_groupby = df_columns_groupby + list(set(df_columns_groupby).symmetric_difference(set(category_options)))
+df_filtered_demography = df[df[selected_category] == selected_sub_category].groupby(df_columns_groupby)['Amount'].sum().sort_values(ascending=False)
+#st.write("selected_category  is " + str(selected_category) + "selected_sub_category" + str(selected_sub_category))
+st.dataframe(df_filtered_demography)
+
+
+#Create a page showing how long it takes between when we receive a patient request and actually send support.
+df_columns = ['Race','Gender','Insurance Type','Grant Req Date','Payment Date']
+df = db.subset_df(column='Payment Date',condition='NaN',op='!=')[df_columns] 
+df['DaysTillPaid']  =  (df['Payment Date'] - df['Grant Req Date'])
+
+
+#Create a page showing how many patients did not use their full grant amount in a given application year. 
+#What are the average amounts given by assistance type? This would help us in terms of budgeting and determining future programming needs.
+
+#Finally, create a page that showcases a high-level summary of impact and progress over the past year that can be shown to stakeholders in the foundation.
