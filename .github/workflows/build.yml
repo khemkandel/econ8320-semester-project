@@ -34,6 +34,12 @@ jobs:
       run: |
         python econ8320-semester-project.py
 
+    - name: Set Git user name and email
+      run: |
+        git config --global user.name "khem"
+        git config --global user.email "khemkandel@gmail.com"
+
+
     # Add your files here and commit them
     - name: Commit changes
       run: |
