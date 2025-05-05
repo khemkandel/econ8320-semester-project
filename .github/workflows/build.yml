@@ -17,7 +17,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        persist-credentials: false  # Disable automatic credential persisting
+        persist-credentials: true  # Disable automatic credential persisting
         token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Set up Python 3.10
