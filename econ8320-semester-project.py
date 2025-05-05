@@ -15,7 +15,7 @@ import sys
 
 
 # List of required packages
-required_packages = ['pgeocode', 'openpyxl', 'pandas','numpy','re','operator','streamlit']
+required_packages = ['pgeocode', 'openpyxl', 'pandas','numpy','re','operator','streamlit','datetime','pyarrow']
 
 # Function to install missing packages
 def install(package):
@@ -38,6 +38,8 @@ import re
 import operator
 from difflib import get_close_matches
 import streamlit as st
+from datetime import datetime
+
 
 class hopeFoundationCancerDatabase(object):
 
@@ -184,6 +186,20 @@ class hopeFoundationCancerDatabase(object):
         df[column_name] = df[column_name].apply(clean_value)
         return df
 
+    def set_datatype(self,df):
+        df['Patient ID#'] = df['Patient ID#'].astype(int)
+        df['Grant Req Date'] = pd.to_datetime(df['Grant Req Date'])
+        df['App Year'] = df['App Year'].astype(int)
+        df['Remaining Balance'] = df['Remaining Balance'].astype(float,2)
+        df['Payment Date'] = pd.to_datetime(df['Payment Submitted?'], errors='coerce')
+        df['Household Size'] = df['Household Size'].astype('Int64')
+        df = self.clean_and_convert_to_float(df, 'Total Household Gross Monthly Income') 
+        df['Total Household Gross Monthly Income'] = df['Total Household Gross Monthly Income'].astype('Float64')
+        df = self.clean_and_convert_to_float(df, 'Distance roundtrip/Tx') 
+        df['Distance roundtrip/Tx'] = df['Distance roundtrip/Tx'].astype('Float64')
+        df = self.clean_and_convert_to_float(df, 'Amount') 
+        return df
+
     def clean_datafile(self,df):
         df = df.replace(r'(?i)^missing$', np.nan, regex=True)
         df = df.replace(r'(?i)^yes$', 'Yes', regex=True)
@@ -195,6 +211,7 @@ class hopeFoundationCancerDatabase(object):
         df['Grant Req Date'] = pd.to_datetime(df['Grant Req Date'])
         df['App Year'] = df['App Year'].astype(int)
         df['Remaining Balance'] = df['Remaining Balance'].astype(float,2)
+        df['Pt City'] = df['Pt City'].astype(str)
                 
         valid_requst_status = ['Approved', 'Pending', 'Denied']
         df = self.validate_values(df,'Request Status',valid_requst_status)
@@ -204,8 +221,8 @@ class hopeFoundationCancerDatabase(object):
 
         payment_map = {
             'valid_vals' : {
-                r'(?i)Yes': 'Yes',
-                r'(?i)no': 'No'
+                r'(?i)^Yes$': 'Yes',
+                r'(?i)^no$': 'No'
             },
             'date_ref': 'Yes',
             'NaN_map': 'Missing',
@@ -220,12 +237,12 @@ class hopeFoundationCancerDatabase(object):
 
         payment_type_map = {
             'valid_vals': {
-                r'(?i)check': 'CK',
-                r'(?i)ck': 'CK',
-                r'(?i)gc': 'GC',
-                r'(?i)cc': 'CC',
-                r'(?i)EFT': 'CK',
-                r'(?i)ACH': 'CK'
+                r'(?i)^check$': 'CK',
+                r'(?i)^ck$': 'CK',
+                r'(?i)^gc$': 'GC',
+                r'(?i)^cc$': 'CC',
+                r'(?i)^EFT$': 'CK',
+                r'(?i)^ACH$': 'CK'
             },
             'valid_others': 'other',
             'NaN_map': 'Missing'
@@ -235,8 +252,8 @@ class hopeFoundationCancerDatabase(object):
 
         language_map ={
             'valid_vals': {
-                r'(?i)english': 'English',
-                r'(?i)spanish': 'Spanish'
+                r'(?i)^english$': 'English',
+                r'(?i)^spanish$': 'Spanish'
             },
             'valid_others': 'other',
             'NaN_map': 'Missing',            
@@ -249,11 +266,11 @@ class hopeFoundationCancerDatabase(object):
         
         marital_status_map ={
             'valid_vals': {
-                r'(?i)Single': 'Single',
-                r'(?i)Married': 'Married',
-                r'(?i)Divorced': 'Divorced',
-                r'(?i)Separated': 'Separated',
-                r'(?i)Domestic Partnership': 'Domestic Partnership'
+                r'(?i)^Single$': 'Single',
+                r'(?i)^Married$': 'Married',
+                r'(?i)^Divorced$': 'Divorced',
+                r'(?i)^Separated$': 'Separated',
+                r'(?i)^Domestic Partnership$': 'Domestic Partnership'
             },
             'valid_others': 'other',
             'NaN_map': 'Missing'
@@ -263,12 +280,13 @@ class hopeFoundationCancerDatabase(object):
 
         gender_map ={
             'valid_vals': {
-                r'(?i)Male': 'Male',
-                r'(?i)Female': 'Female',
-                r'(?i)Transgender Male': 'Transgender Male',
-                r'(?i)Non-Binary': 'Non-Binary',
-                r'(?i)Another Gender Identity': 'Another Gender Identity',
-                r'(?i)Decline to Answer': 'Decline to Answer'
+                r'(?i)^Male$': 'Male',
+                r'(?i)^Female$': 'Female',
+                r'(?i)^Transgender Male$': 'Transgender Male',
+                r'(?i)^Transgender Female$': 'Transgender Female',
+                r'(?i)^Non-Binary$': 'Non-Binary',
+                r'(?i)^Another Gender Identity$': 'Another Gender Identity',
+                r'(?i)^Decline to Answer$': 'Decline to Answer'
             },
             'valid_others': 'other',
             'NaN_map': 'Missing'
@@ -277,16 +295,16 @@ class hopeFoundationCancerDatabase(object):
 
         race_ethnicity_map = {
             'valid_vals': {
-                r'(?i)American Indian or Alaskan Native': 'American Indian or Alaskan Native',
-                r'(?i)American Indian or Alaksa Native': 'American Indian or Alaskan Native',
-                r'(?i)American Indian or Alaska Native': 'American Indian or Alaskan Native',
-                r'(?i)Asian': 'Asian',
-                r'(?i)Black or African American': 'Black or African American',
-                r'(?i)Native Hawaiian or Other Pacific Islander': 'Native Hawaiian or Other Pacific Islander',
-                r'(?i)White': 'White',
-                r'(?i)Whiate': 'White',
-                r'(?i)Decline to Answer': 'Decline to Answer',
-                r'(?i)Two or more races': 'Two or more races',
+                r'(?i)^American Indian or Alaskan Native$': 'American Indian or Alaskan Native',
+                r'(?i)^American Indian or Alaksa Native$': 'American Indian or Alaskan Native',
+                r'(?i)^American Indian or Alaska Native$': 'American Indian or Alaskan Native',
+                r'(?i)^Asian$': 'Asian',
+                r'(?i)^Black or African American$': 'Black or African American',
+                r'(?i)^Native Hawaiian or Other Pacific Islander$': 'Native Hawaiian or Other Pacific Islander',
+                r'(?i)^White$': 'White',
+                r'(?i)^Whiate$': 'White',
+                r'(?i)^Decline to Answer$': 'Decline to Answer',
+                r'(?i)^Two or more races$': 'Two or more races',
             },
             'valid_others': 'other',
             'NaN_map': 'Missing'
@@ -383,10 +401,10 @@ class hopeFoundationCancerDatabase(object):
 
         patient_notification_map ={
             'valid_vals': {
-                r'(?i)Yes': 'Yes',
-                r'(?i)no': 'No',
-                r'(?i)na': 'No',
-                r'(?i)HOLD': 'No'
+                r'(?i)^Yes$': 'Yes',
+                r'(?i)^no$': 'No',
+                r'(?i)^na$': 'No',
+                r'(?i)^HOLD$': 'No'
             },
             'date_ref': 'Yes'
         }
@@ -394,9 +412,11 @@ class hopeFoundationCancerDatabase(object):
 
         application_signed_map ={
             'valid_vals': {
-                r'(?i)Yes': 'Yes',
-                r'(?i)no': 'No',
-                r'(?i)na': 'No'
+                r'(?i)^Yes$': 'Yes',
+                r'(?i)^no$': 'No',
+                r'(?i)^na$': 'No',
+                r'(?i)n/a': 'No',
+                
             },
             'date_ref': 'Yes',
             'NaN_map': 'Missing'
@@ -405,112 +425,24 @@ class hopeFoundationCancerDatabase(object):
 
         return df
 
-    def __init__(self,url):
-        self.nomi = pgeocode.Nominatim('us')
+    def load_orig(self,url):
         self.database_orig = self.load_db(url)
+        return self.database_orig
+    
+    def create_clean(self):
         self.database_clean = self.clean_datafile(self.database_orig)
+        return self.database_clean
 
 
-    def subset_df(self, column, condition, op='=='):
-        """
-        Return the rows of df where df[column] meets the given condition.
+    def __init__(self):
+        self.nomi = pgeocode.Nominatim('us')
+        self.database_orig = pd.DataFrame() 
+        self.database_clean = pd.DataFrame()
 
-        Parameters
-        ----------
-        df : pandas.DataFrame
-        column : str
-            The column to test.
-        condition : scalar or callable
-            • If scalar: compare df[column] to this value using operator `op`.
-            • If callable: should accept a Series and return a boolean Series.
-        op : str, one of ['==','!=','>','>=','<','<=','isna','notna'], default '=='
-            The comparison operator to use when condition is a scalar.
-
-        Returns
-        -------
-        pandas.DataFrame
-            Subset of df where the condition holds.
-        """
-        df = self.database_clean
-
-        if callable(condition):
-            mask = condition(df[column])
-        else:
-            # operator mapping
-            ops = {
-                '==': operator.eq,
-                '!=': operator.ne,
-                '>':  operator.gt,
-                '>=': operator.ge,
-                '<':  operator.lt,
-                '<=': operator.le,
-                'isna': pd.Series.isna,
-                'notna': pd.Series.notna,
-            }
-
-            if op not in ops:
-                raise ValueError(f"Unsupported operator {op!r}, choose from {list(ops)}")
-
-            if op in ['isna', 'notna']:
-                mask = ops[op](df[column])  # no condition needed
-            else:
-                mask = ops[op](df[column], condition)
-
-        return df.loc[mask]
-
-    # def __repr__(self):
-    #     print(self.database)
-    def show_message(self):
-        st.write("This is a helper message!")
 
 url="./UNO Service Learning Data Sheet De-Identified Version.xlsx"
-db = hopeFoundationCancerDatabase(url)
-data_o = db.database_orig
-data_c = db.database_clean
-
-#Create a page showing all of the applications that are "ready for review", and 
-# can be filtered by whether or not the application has been signed by the necessary committee members.
-
-df = db.subset_df(column='Request Status',condition="Approved",op='==')
-# Dropdown to select a category
-category_options = df['Application Signed?'].unique()
-selected_category = st.selectbox("Filter by Category", category_options)
-
-# Filter the DataFrame
-filtered_df = df[df['Application Signed?'] == selected_category]
-
-# Display the filtered DataFrame
-st.dataframe(filtered_df)
-
-
-
-#Create a page answering "how much support do we give, based on location, gender, income size, insurance type, age, etc". 
-#In other words, break out how much support is offered by the listed demographics.
-
-category_options = ['Race','Gender','Insurance Type']
-selected_category = st.selectbox("Main Filter Category", category_options,index=0)
-
-sub_category_options = db.database_clean[selected_category].unique()
-selected_sub_category = st.selectbox("Sub Category", sub_category_options,index=0)
-
-df_columns = category_options.copy()
-df_columns.append('Amount')
-df = db.subset_df(column='Amount',condition=0,op='>')[df_columns] 
-
-df_columns_groupby = [selected_category]
-df_columns_groupby = df_columns_groupby + list(set(df_columns_groupby).symmetric_difference(set(category_options)))
-df_filtered_demography = df[df[selected_category] == selected_sub_category].groupby(df_columns_groupby)['Amount'].sum().sort_values(ascending=False)
-#st.write("selected_category  is " + str(selected_category) + "selected_sub_category" + str(selected_sub_category))
-st.dataframe(df_filtered_demography)
-
-
-#Create a page showing how long it takes between when we receive a patient request and actually send support.
-df_columns = ['Race','Gender','Insurance Type','Grant Req Date','Payment Date']
-df = db.subset_df(column='Payment Date',condition='', op='notna')[df_columns] 
-df['DaysTillPaid']  =  (df['Payment Date'] - df['Grant Req Date'])
-
-
-#Create a page showing how many patients did not use their full grant amount in a given application year. 
-#What are the average amounts given by assistance type? This would help us in terms of budgeting and determining future programming needs.
-
-#Finally, create a page that showcases a high-level summary of impact and progress over the past year that can be shown to stakeholders in the foundation.
+db = hopeFoundationCancerDatabase()
+data_o = db.load_orig(url)
+data_c = db.create_clean()
+data_o.to_excel('database_original_latest.xlsx', index=False)
+data_c.to_excel('database_clean_latest.xlsx', index=False)
