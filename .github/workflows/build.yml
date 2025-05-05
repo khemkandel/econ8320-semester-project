@@ -16,6 +16,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Set up Python 3.10
       uses: actions/setup-python@v3
@@ -31,3 +33,12 @@ jobs:
     - name: Clean Data File
       run: |
         python econ8320-semester-project.py
+
+    # Add your files here and commit them
+    - name: Commit changes
+      run: |
+        git add database_clean_latest.xlsx  database_original_latest.xlsx  # Add specific files you want to commit
+        git commit -m "Automated update from GitHub Actions"
+        git push origin main  # Push to the main branch
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Automatically used by GitHub Actions
