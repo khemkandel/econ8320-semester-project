@@ -2,8 +2,5 @@ pgeocode
 openpyxl
 pandas
 numpy
-re
-operator
 streamlit
-datetime
 pyarrow
