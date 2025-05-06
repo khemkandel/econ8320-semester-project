@@ -3,9 +3,9 @@ name: processHopeFoundationDatabase
 on:
   push:
     branches: main
-  paths:
-    - 'UNO Service Learning Data Sheet De-Identified Version.xlsx'
-    
+    paths:
+      - 'UNO Service Learning Data Sheet De-Identified Version.xlsx'
+
   workflow_dispatch:
 
 permissions:
