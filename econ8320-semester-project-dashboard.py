@@ -132,7 +132,7 @@ with st.sidebar:
 
 # Main Content Based on Selection
 
-if page == "Overview":
+if selected == "Overview":
     #Finally, create a page that showcases a high-level summary of impact and progress over the past year that can be shown to stakeholders in the foundation.
     #Total Patient and their approval Status
     # Two columns
@@ -190,7 +190,7 @@ if page == "Overview":
     st.dataframe(df.reset_index(drop=True).style.format({'Total Paid': '{:.2f}'}))
     st.write("Total Amount Paid : " + str(total_paid))
 
-elif page == "Request Status":
+elif selected == "Request Status":
     # Create a page showing all of the applications that are "ready for review", and 
     # can be filtered by whether or not the application has been signed by the necessary committee members.
 
@@ -206,7 +206,7 @@ elif page == "Request Status":
     # Display the filtered DataFrame
     st.dataframe(filtered_df.reset_index(drop=True))
 
-elif page == "Data Quality":
+elif selected == "Data Quality":
     
     ##row2:
     # Missing Data
@@ -245,7 +245,7 @@ elif page == "Data Quality":
     st.title("Data Quality Summary")
     st.table(summary_df.reset_index(drop=True)) 
 
-elif page == "Demographics":  
+elif selected == "Demographics":  
     #Create a page answering "how much support do we give, based on location, gender, income size, insurance type, age, etc". 
     #In other words, break out how much support is offered by the listed demographics.
     st.title("Demographics Information")
