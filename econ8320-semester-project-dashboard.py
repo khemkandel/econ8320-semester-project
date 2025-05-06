@@ -15,7 +15,7 @@ import sys
 
 
 # List of required packages
-required_packages = ['pgeocode', 'openpyxl', 'pandas','numpy','re','operator','streamlit','datetime','pyarrow']
+required_packages = ['pgeocode', 'openpyxl', 'pandas','numpy','re','operator','streamlit','datetime','pyarrow','streamlit_option_menu']
 
 # Function to install missing packages
 def install(package):
@@ -39,6 +39,7 @@ import operator
 from difflib import get_close_matches
 import streamlit as st
 from datetime import datetime
+from streamlit_option_menu import option_menu
 
 def subset_df(df, column, condition, op='=='):
     """
@@ -110,18 +111,24 @@ def styled_text(text, size=16, color="black", weight="normal"):
     )
 
 
-# def __repr__(self):
-#     print(self.database)
-def show_message(self):
-    st.write("This is a helper message!")
-
 data_o = pd.read_excel("./database_original_latest.xlsx")
 data_c = pd.read_excel("./database_clean_latest.xlsx")
 
 
 # Sidebar
-st.sidebar.title("📊 Hope Foundation")
-page = st.sidebar.radio("Go to", ["Overview", "Request Status", "Demographics", "Data Quality"])
+# st.sidebar.title("📊 Hope Foundation")
+# page = st.sidebar.radio("Go to", ["Overview", "Request Status", "Demographics", "Data Quality"])
+
+with st.sidebar:
+    selected = option_menu(
+    menu_title = "Hope Foundation",
+    options = ["Overview", "Request Status", "Demographics", "Data Quality"],
+    icons = ["house","activity","Population","	Validation/Test"],
+    menu_icon = "cast",
+    default_index = 0,
+    #orientation = "horizontal",
+)
+
 
 # Main Content Based on Selection
 
