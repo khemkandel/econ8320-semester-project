@@ -18,7 +18,7 @@ jobs:
     - uses: actions/checkout@v4
       with:
         persist-credentials: true  # Disable automatic credential persisting
-        token: ${{ secrets.GITHUB_TOKEN }}
+        token: ${{ secrets.PAT_ECON_8320 }}
 
     - name: Set up Python 3.10
       uses: actions/setup-python@v3
@@ -37,8 +37,8 @@ jobs:
 
     - name: Set Git user name and email
       run: |
-        git config --global user.name "khem"
-        git config --global user.email "khemkandel@gmail.com"
+        git config --global user.name ${{ variables.GIT_CONFIG_USERNAME }}
+        git config --global user.email ${{ variables.GIT_CONFIG_EMAIL }}
 
 
     # Add your files here and commit them
@@ -48,4 +48,4 @@ jobs:
         git commit -m "Automated update from GitHub Actions"
         git push origin main  # Push to the main branch
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Automatically used by GitHub Actions
+        GITHUB_TOKEN: ${{ secrets.PAT_ECON_8320 }}  # Automatically used by GitHub Actions
