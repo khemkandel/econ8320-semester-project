@@ -1,10 +1,11 @@
 name: processHopeFoundationDatabase
 
 on:
-  # push:
-  #   branches: [ $default-branch ]
-  # pull_request:
-  #   branches: [ $default-branch ]
+  push:
+    branches: main
+  paths:
+    - 'UNO Service Learning Data Sheet De-Identified Version.xlsx'
+    
   workflow_dispatch:
 
 permissions:
