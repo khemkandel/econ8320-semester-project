@@ -40,6 +40,7 @@ from difflib import get_close_matches
 import streamlit as st
 from datetime import datetime
 from streamlit_option_menu import option_menu
+import plotly.express as px
 
 def subset_df(df, column, condition, op='=='):
     """
@@ -137,7 +138,7 @@ if selected == "Overview":
     #Total Patient and their approval Status
     # Two columns
     year = datetime.now().year - 1
-    st.title("📈 Summary Page " + str(year))
+    st.title("📈 Year in Review " + str(year))
 
     # col1, col2 = st.columns(2)
 
@@ -149,16 +150,46 @@ if selected == "Overview":
     #st.write("Patient Approval ")
     custom_header(text="Patient Approval ", size=20, weight='bold', color='#000000',align='center', icon=None)
 
-    show_by = st.checkbox('Break by Application Signed Status',value=False)
-    if show_by:
+    show_by_breakdown = st.checkbox('Break by Application Signed Status',value=False)
+    if show_by_breakdown:
         by_columns = ['Request Status','Application Signed?']
     else:
         by_columns = ['Request Status']
     df = df.groupby(by_columns).size().reset_index(name='Count')
 
 
-    st.dataframe(df.reset_index(drop=True))
-    st.write("Total Patient : " + str(totalRequests))
+    
+    if show_by_breakdown:
+        # Grouped bar chart
+        fig = px.bar(
+            df,
+            x='Request Status',
+            y='Count',
+            color='Application Signed?',         # distinguishes bars side-by-side
+            barmode='group',       # enables side-by-side bars
+            labels={
+                'Request Status': 'Request Status',
+                'Count': 'Patient Count'
+            },
+            title="Patient Approval Status"
+        )
+
+        st.plotly_chart(fig, use_container_width=True)
+    else:
+
+        # Create pie chart with Plotly
+        fig = px.pie(
+            df,
+            names='Request Status',
+            values='Count',
+            title= "Total Patient : " + str(totalRequests),
+            hole=0.3  # optional: for donut-style pie
+        )
+
+        # Display in Streamlit
+        st.plotly_chart(fig, use_container_width=True)
+        # st.dataframe(df.reset_index(drop=True))
+        # st.write("Total Patient : " + str(totalRequests))
 
 
 
@@ -187,8 +218,29 @@ if selected == "Overview":
     df = df.sort_values(
         by=sort_columns,
         ascending=sort_order)
-    st.dataframe(df.reset_index(drop=True).style.format({'Total Paid': '{:.2f}'}))
-    st.write("Total Amount Paid : " + str(total_paid))
+
+
+    if show_by_total_paid:
+        st.dataframe(df.reset_index(drop=True).style.format({'Total Paid': '{:.2f}'}))
+        st.write("Total Amount Paid : " + str(total_paid))
+    else:
+        # Create horizontal bar chart
+        fig = px.bar(
+            df,
+            x='Total Paid',
+            y='Type of Assistance (CLASS)',
+            orientation='h',
+            title='Amount Paid by Category',
+            labels={'Total Paid': 'Expense ($)', 'Category': 'Category'},
+            color='Type of Assistance (CLASS)'  # optional: color by category
+        )
+        # Remove legend
+        fig.update_layout(showlegend=False)
+
+        # Display in Streamlit
+        st.plotly_chart(fig, use_container_width=True)
+
+
 
 elif selected == "Request Status":
     # Create a page showing all of the applications that are "ready for review", and 
