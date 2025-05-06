@@ -49,3 +49,13 @@ jobs:
         git push origin main  # Push to the main branch
       env:
         GITHUB_TOKEN: ${{ secrets.PAT_ECON_8320 }}  # Automatically used by GitHub Actions
+
+
+    - name: List matching files
+      run: ls -la database_*_latest.xlsx || echo "No files found"
+
+    - name: Upload matching Excel files
+      uses: actions/upload-artifact@v4
+      with:
+        name: clean-data-hopefoundation
+        path: database_*_latest.xlsx
