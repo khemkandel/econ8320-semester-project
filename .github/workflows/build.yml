@@ -37,8 +37,8 @@ jobs:
 
     - name: Set Git user name and email
       run: |
-        git config --global user.name ${{ variables.GIT_CONFIG_USERNAME }}
-        git config --global user.email ${{ variables.GIT_CONFIG_EMAIL }}
+        git config --global user.name ${{ vars.GIT_CONFIG_USERNAME }}
+        git config --global user.email ${{ vars.GIT_CONFIG_EMAIL }}
 
 
     # Add your files here and commit them
