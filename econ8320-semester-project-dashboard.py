@@ -42,6 +42,7 @@ from datetime import datetime
 from streamlit_option_menu import option_menu
 import plotly.express as px
 
+
 def subset_df(df, column, condition, op='=='):
     """
     Return the rows of df where df[column] meets the given condition.
@@ -123,8 +124,8 @@ data_c = pd.read_excel("./database_clean_latest.xlsx")
 with st.sidebar:
     selected = option_menu(
     menu_title = "Hope Foundation",
-    options = ["Overview", "Request Status", "Demographics", "Data Quality"],
-    icons = ["house","activity","Population","	Validation/Test"],
+    options = ["Overview","Last Year - Overview", "Request Status", "Demographics", "Data Quality"],
+    icons = ["house","rewind","activity","Population","	Validation/Test"],
     menu_icon = "cast",
     default_index = 0,
     #orientation = "horizontal",
@@ -133,7 +134,7 @@ with st.sidebar:
 
 # Main Content Based on Selection
 
-if selected == "Overview":
+if selected == "Last Year - Overview":
     #Finally, create a page that showcases a high-level summary of impact and progress over the past year that can be shown to stakeholders in the foundation.
     #Total Patient and their approval Status
     # Two columns
@@ -356,4 +357,68 @@ elif selected == "Demographics":
     st.dataframe(df)
 
 else:
-    st.write("The END")
+    custom_header(text="Amount Distribution by Year",align='center')
+    col1, col2 = st.columns(2)
+    with col1:
+        by_columns = ['Payment Date', 'Amount']
+        df = data_c[by_columns].copy()
+
+        # Extract year safely
+        df['Year'] = pd.to_datetime(df['Payment Date'], errors='coerce').dt.year
+
+        # Convert to Int (drop decimals), then to string, replacing NaNs with 'unknown'
+        df['Year'] = df['Year'].apply(lambda x: str(int(x)) if pd.notnull(x) else 'unknown')
+
+        # Filter and group
+        df = df[df['Amount'] > 0].groupby('Year')['Amount'].sum()
+        st.bar_chart(df)
+        #st.dataframe(df)
+
+    with col2:
+        df_reset = df.reset_index()
+        fig = px.pie(df_reset, names='Year', values='Amount')
+        fig.update_layout(showlegend=False)
+        st.plotly_chart(fig)
+
+
+    df = data_c.groupby(['Pt City','Pt State'])['Patient ID#'].nunique().reset_index()
+    df.rename(columns={'Patient ID#': 'Patient Count'}, inplace=True)
+    df['Pt City'] = df['Pt City'].str.title() 
+    df['Pt State'] = df['Pt State'].str.upper()
+
+    us_cities = pd.read_csv("./us_cities.csv")
+
+
+    merged_df = pd.merge(df, us_cities, left_on=['Pt City', 'Pt State'],right_on=['CITY','STATE_CODE'], how='left')
+    # coords = {
+    #     'Lincoln': (40.8136, -96.7026),
+    #     'Omaha': (41.2565, -95.9345),
+    #     'Kearney': (40.6995, -99.0815),
+    #     'Norfolk': (42.0324, -97.4160),
+    # }
+
+    # df['lat'] = df['Pt City'].map(lambda x: coords[x][0])
+    # df['lon'] = df['Pt City'].map(lambda x: coords[x][1])
+
+    #st.map(df[['lat', 'lon', 'Patient Count']])
+
+    
+    fig = px.scatter_geo(
+        merged_df,
+        lat='LATITUDE',
+        lon='LONGITUDE',
+        size='Patient Count',
+        hover_name='Pt City',
+        title='Patient Count by City in Nebraska'
+    )
+    fig.update_geos(
+    scope='usa',
+    center={'lat': 41.5, 'lon': -99.5},  # Centered on Nebraska
+    projection_scale=5.5,  # Zooms into Nebraska
+    showcountries=False,  # Hide country borders
+    showcoastlines=False,  # Hide coastlines
+    showland=True,
+    landcolor="lightgrey"
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
