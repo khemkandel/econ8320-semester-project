@@ -1,18 +1,18 @@
-#pip install openpyxl
-#pip install pgeocode
-#function prompt { "$(Split-Path -Leaf (Get-Location))> " }
-#python -m streamlit run .\econ8320-semester-project.py
 
+# Allows you to control what you see on Termial for Prompt PATH
+#   function prompt { "$(Split-Path -Leaf (Get-Location))> " }
+# Command to Run Steamlit
+#   python -m streamlit run .\econ8320-semester-project.py
+# Show all rows
+# pd.set_option('display.max_rows', None)
+# (optional) Show all columns too
+# pd.set_option('display.max_columns', None)
+# pd.set_option('future.no_silent_downcasting', True)
+
+# Modules needed for Installing new packages
+# If this is ran manually, below modules installs required modules
 import subprocess
 import sys
-
-# Show all rows
-#pd.set_option('display.max_rows', None)
-
-# (optional) Show all columns too
-#pd.set_option('display.max_columns', None)
-#pd.set_option('future.no_silent_downcasting', True)
-
 
 # List of required packages
 required_packages = ['pgeocode', 'openpyxl', 'pandas','numpy','re','operator','streamlit','datetime','pyarrow','streamlit_option_menu']
@@ -30,7 +30,8 @@ for package in required_packages:
         install(package)
 
 
-
+#### Import Requied Modules
+##--------------------------
 import pandas as pd
 import numpy as np
 import pgeocode
@@ -42,6 +43,10 @@ from datetime import datetime
 from streamlit_option_menu import option_menu
 import plotly.express as px
 
+
+
+# Function that allows you to get the subset of a table 
+#-----------------------------------------------------------
 
 def subset_df(df, column, condition, op='=='):
     """
@@ -89,6 +94,12 @@ def subset_df(df, column, condition, op='=='):
 
     return df.loc[mask]
 
+
+
+# Function to manage Streamlit Custom Headers. St.Header provides limited functionality to 
+# change text, alignment, color , font size. With this function all that can be managed
+#---------------------------------------------------------
+
 def custom_header(text, size=20, weight='bold', color='#000000',align='left', icon=None):
     """
     Display a custom styled header in Streamlit.
@@ -106,6 +117,10 @@ def custom_header(text, size=20, weight='bold', color='#000000',align='left', ic
         unsafe_allow_html=True
     )
 
+# Custom function to change the style of text
+#-------------------------------------------------------
+
+
 def styled_text(text, size=16, color="black", weight="normal"):
     st.markdown(
         f"<p style='font-size:{size}px; color:{color}; font-weight:{weight};'>{text}</p>",
@@ -113,14 +128,16 @@ def styled_text(text, size=16, color="black", weight="normal"):
     )
 
 
+############# EXECUTION STARTS HERE ############################
+#--------------------------------------------------------------#
+
+
 data_o = pd.read_excel("./database_original_latest.xlsx")
 data_c = pd.read_excel("./database_clean_latest.xlsx")
 
 
-# Sidebar
-# st.sidebar.title("📊 Hope Foundation")
-# page = st.sidebar.radio("Go to", ["Overview", "Request Status", "Demographics", "Data Quality"])
-
+# Control Left Navaigation Panel
+#-------------------------------#
 with st.sidebar:
     selected = option_menu(
     menu_title = "Hope Foundation",
@@ -133,22 +150,96 @@ with st.sidebar:
 
 
 # Main Content Based on Selection
+#--------------------------------#
 
-if selected == "Last Year - Overview":
-    #Finally, create a page that showcases a high-level summary of impact and progress over the past year that can be shown to stakeholders in the foundation.
-    #Total Patient and their approval Status
-    # Two columns
+
+##              SUMMARY OF IMPACT AND PROGRESS THAT CAN BE SHOWN TO STAKEHOLDERS IN THE FOUNDATION       ##
+##-------------------------------------------------------------------------------------------------------##
+if selected == "Overview":
+
+    custom_header(text="Amount Distribution by Year",align='center')
+    r1col1,r1col2 = st.columns(2)
+    custom_header(text="People we have Helped",align='center')
+    r2col1, r2col2 = st.columns(2)
+
+    
+    with r1col1:
+        by_columns = ['Payment Date', 'Amount']
+        df = data_c[by_columns].copy()
+
+        # Extract year safely
+        df['Year'] = pd.to_datetime(df['Payment Date'], errors='coerce').dt.year
+
+        # Convert to Int (drop decimals), then to string, replacing NaNs with 'unknown'
+        df['Year'] = df['Year'].apply(lambda x: str(int(x)) if pd.notnull(x) else 'unknown')
+
+        # Filter and group
+        df = df[df['Amount'] > 0].groupby('Year')['Amount'].sum()
+        st.bar_chart(df)
+        #st.dataframe(df)
+
+    with r1col2:
+        df_reset = df.reset_index()
+        fig = px.pie(df_reset, names='Year', values='Amount')
+        fig.update_layout(showlegend=True)
+        st.plotly_chart(fig)
+
+    with r2col1:
+        title='Patient Count by City in Nebraska'
+        df = data_c.groupby(['Pt City','Pt State'])['Patient ID#'].nunique().reset_index()
+        df.rename(columns={'Patient ID#': 'Patient Count'}, inplace=True)
+        df['Pt City'] = df['Pt City'].str.title() 
+        df['Pt State'] = df['Pt State'].str.upper()
+        df = df.groupby(['Pt City','Pt State'])['Patient Count'].sum()
+
+        us_cities = pd.read_csv("./us_cities.csv")
+
+
+        merged_df = pd.merge(df, us_cities, left_on=['Pt City', 'Pt State'],right_on=['CITY','STATE_CODE'], how='left')
+        
+        fig = px.scatter_geo(
+            merged_df,
+            lat='LATITUDE',
+            lon='LONGITUDE',
+            size='Patient Count',
+            hover_name='CITY'
+        )
+        fig.update_geos(
+        scope='usa',
+        center={'lat': 41.5, 'lon': -99.5},  # Centered on Nebraska
+        projection_scale=5.5,  # Zooms into Nebraska
+        showcountries=False,  # Hide country borders
+        showcoastlines=False
+        )
+        # Style tweaks
+        fig.update_traces(marker=dict(line=dict(width=0.5, color='red')))
+        fig.update_layout(geo=dict(showland=True, landcolor="#D2B48C"))
+
+        st.plotly_chart(fig, use_container_width=True)
+
+
+    with r2col2:
+        df = data_c.groupby(['Race','Gender'])['Amount'].sum().reset_index()
+        fig = px.bar(
+            df,
+            x='Race',
+            y='Amount',
+            color='Gender',         # distinguishes bars side-by-side
+            barmode='group'         # enables side-by-side bars
+        )
+        fig.update_layout(showlegend=False)
+        st.plotly_chart(fig, use_container_width=True)
+
+
+#SHOWCASES A HIGH-LEVEL SUMMARY OF IMPACT AND PROGRESS OVER THE PAST YEAR THAT CAN BE SHOWN TO STAKEHOLDERS IN THE FOUNDATION.#
+##---------------------------------------------------------------------------------------------------------------------------##
+elif selected == "Last Year - Overview":
     year = datetime.now().year - 1
     st.title("📈 Year in Review " + str(year))
-
-    # col1, col2 = st.columns(2)
-
-    # with col1:
 
     by_columns = ['Patient ID#','Request Status','Application Signed?']
     df = data_c[data_c['Grant Req Date'].dt.year == (year)][by_columns].drop_duplicates()
     totalRequests = len(df)
-    #st.write("Patient Approval ")
     custom_header(text="Patient Approval ", size=20, weight='bold', color='#000000',align='center', icon=None)
 
     show_by_breakdown = st.checkbox('Break by Application Signed Status',value=False)
@@ -167,7 +258,7 @@ if selected == "Last Year - Overview":
             x='Request Status',
             y='Count',
             color='Application Signed?',         # distinguishes bars side-by-side
-            barmode='group',       # enables side-by-side bars
+            barmode='group',                     # enables side-by-side bars
             labels={
                 'Request Status': 'Request Status',
                 'Count': 'Patient Count'
@@ -189,13 +280,6 @@ if selected == "Last Year - Overview":
 
         # Display in Streamlit
         st.plotly_chart(fig, use_container_width=True)
-        # st.dataframe(df.reset_index(drop=True))
-        # st.write("Total Patient : " + str(totalRequests))
-
-
-
-
-    # with col2:
 
     # Total Paid Last Year
     by_columns = ['Type of Assistance (CLASS)','Race','Gender','Amount']
@@ -232,20 +316,23 @@ if selected == "Last Year - Overview":
             y='Type of Assistance (CLASS)',
             orientation='h',
             title='Amount Paid by Category',
-            labels={'Total Paid': 'Expense ($)', 'Category': 'Category'},
+            labels={'Total Paid': 'Expense ($)'},
             color='Type of Assistance (CLASS)'  # optional: color by category
         )
         # Remove legend
         fig.update_layout(showlegend=False)
+        fig.update_layout( yaxis_title="")
 
         # Display in Streamlit
         st.plotly_chart(fig, use_container_width=True)
 
 
-
+#----------------------------------------------------------------------------------------------------------#
+# Create a page showing all of the applications that are "ready for review", and                           #
+# can be filtered by whether or not the application has been signed by the necessary committee members.    #
+#----------------------------------------------------------------------------------------------------------#
 elif selected == "Request Status":
-    # Create a page showing all of the applications that are "ready for review", and 
-    # can be filtered by whether or not the application has been signed by the necessary committee members.
+
 
     st.title("📈 Request Ready for Review ")
     df = subset_df(df=data_c,column='Request Status',condition="Approved",op='==')
@@ -259,10 +346,11 @@ elif selected == "Request Status":
     # Display the filtered DataFrame
     st.dataframe(filtered_df.reset_index(drop=True))
 
+#------------------------------------------------------------#    
+#                         REPORT MISSING DATA                #
+#------------------------------------------------------------#
 elif selected == "Data Quality":
-    
-    ##row2:
-    # Missing Data
+
 
     totalInvalidGrantReqDate = pd.to_datetime(data_c['Grant Req Date'], errors='coerce').isna().sum()
     totalInvalidRemaingBalance = ((data_c['Remaining Balance'] < 0) | (data_c['Remaining Balance'].isna())).sum()
@@ -298,9 +386,13 @@ elif selected == "Data Quality":
     st.title("Data Quality Summary")
     st.table(summary_df.reset_index(drop=True)) 
 
+    
+#---------------------------------------------------------------------------------------#
+#   Create a page answering "how much support do we give, based on location, gender,    #
+#   income size, insurance type, age, etc".                                             #
+#   In other words, break out how much support is offered by the listed demographics.   #
+#---------------------------------------------------------------------------------------#
 elif selected == "Demographics":  
-    #Create a page answering "how much support do we give, based on location, gender, income size, insurance type, age, etc". 
-    #In other words, break out how much support is offered by the listed demographics.
     st.title("Demographics Information")
     category_options = ['Race','Gender','Insurance Type']
     selected_category = st.selectbox("Select Demographic Category", category_options,index=0)
@@ -357,68 +449,4 @@ elif selected == "Demographics":
     st.dataframe(df)
 
 else:
-    custom_header(text="Amount Distribution by Year",align='center')
-    col1, col2 = st.columns(2)
-    with col1:
-        by_columns = ['Payment Date', 'Amount']
-        df = data_c[by_columns].copy()
-
-        # Extract year safely
-        df['Year'] = pd.to_datetime(df['Payment Date'], errors='coerce').dt.year
-
-        # Convert to Int (drop decimals), then to string, replacing NaNs with 'unknown'
-        df['Year'] = df['Year'].apply(lambda x: str(int(x)) if pd.notnull(x) else 'unknown')
-
-        # Filter and group
-        df = df[df['Amount'] > 0].groupby('Year')['Amount'].sum()
-        st.bar_chart(df)
-        #st.dataframe(df)
-
-    with col2:
-        df_reset = df.reset_index()
-        fig = px.pie(df_reset, names='Year', values='Amount')
-        fig.update_layout(showlegend=False)
-        st.plotly_chart(fig)
-
-
-    df = data_c.groupby(['Pt City','Pt State'])['Patient ID#'].nunique().reset_index()
-    df.rename(columns={'Patient ID#': 'Patient Count'}, inplace=True)
-    df['Pt City'] = df['Pt City'].str.title() 
-    df['Pt State'] = df['Pt State'].str.upper()
-
-    us_cities = pd.read_csv("./us_cities.csv")
-
-
-    merged_df = pd.merge(df, us_cities, left_on=['Pt City', 'Pt State'],right_on=['CITY','STATE_CODE'], how='left')
-    # coords = {
-    #     'Lincoln': (40.8136, -96.7026),
-    #     'Omaha': (41.2565, -95.9345),
-    #     'Kearney': (40.6995, -99.0815),
-    #     'Norfolk': (42.0324, -97.4160),
-    # }
-
-    # df['lat'] = df['Pt City'].map(lambda x: coords[x][0])
-    # df['lon'] = df['Pt City'].map(lambda x: coords[x][1])
-
-    #st.map(df[['lat', 'lon', 'Patient Count']])
-
-    
-    fig = px.scatter_geo(
-        merged_df,
-        lat='LATITUDE',
-        lon='LONGITUDE',
-        size='Patient Count',
-        hover_name='Pt City',
-        title='Patient Count by City in Nebraska'
-    )
-    fig.update_geos(
-    scope='usa',
-    center={'lat': 41.5, 'lon': -99.5},  # Centered on Nebraska
-    projection_scale=5.5,  # Zooms into Nebraska
-    showcountries=False,  # Hide country borders
-    showcoastlines=False,  # Hide coastlines
-    showland=True,
-    landcolor="lightgrey"
-    )
-
-    st.plotly_chart(fig, use_container_width=True)
+   st.write("The END")

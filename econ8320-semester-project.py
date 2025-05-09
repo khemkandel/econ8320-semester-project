@@ -1,18 +1,18 @@
-#pip install openpyxl
-#pip install pgeocode
-#function prompt { "$(Split-Path -Leaf (Get-Location))> " }
-#python -m streamlit run .\econ8320-semester-project.py
+# Allows you to control what you see on Termial for Prompt PATH
+#   function prompt { "$(Split-Path -Leaf (Get-Location))> " }
+# Command to Run Steamlit
+#   python -m streamlit run .\econ8320-semester-project.py
+# Show all rows
+# pd.set_option('display.max_rows', None)
+# (optional) Show all columns too
+# pd.set_option('display.max_columns', None)
+# pd.set_option('future.no_silent_downcasting', True)
+
+# Modules needed for Installing new packages
+# If this is ran manually, below modules installs required modules
 
 import subprocess
 import sys
-
-# Show all rows
-#pd.set_option('display.max_rows', None)
-
-# (optional) Show all columns too
-#pd.set_option('display.max_columns', None)
-#pd.set_option('future.no_silent_downcasting', True)
-
 
 # List of required packages
 required_packages = ['pgeocode', 'openpyxl', 'pandas','numpy','re','operator','streamlit','datetime','pyarrow']
@@ -30,6 +30,8 @@ for package in required_packages:
         install(package)
 
 
+#### Import Requied Modules
+##--------------------------
 
 import pandas as pd
 import numpy as np
@@ -41,8 +43,25 @@ import streamlit as st
 from datetime import datetime
 
 
+#---------------------------------------------------------------------------------------#
+# Python Class that manages the data Cleanup:                                           #
+#                                                                                       #
+# This class instantiates a dataframe that holds data for                               #
+#          self.database_orig: original datafile                                        #
+#          self.database_clean: clean_datafile                                          #
+# This also uses geocode.Nominatim('us') which  require an internet connection to work  #
+# properly because it typically fetches geographic data from an online database.        #
+#                                                                                       #
+# --------------------------------------------------------------------------------------#
+#   
+#   
+#
+
+
+
 class hopeFoundationCancerDatabase(object):
 
+    
     def clean_zip(self,zip_code):
         #nomi = pgeocode.Nominatim('us')
         if pd.isna(zip_code):
