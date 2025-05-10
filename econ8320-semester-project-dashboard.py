@@ -419,7 +419,7 @@ elif selected == "Demographics":
 
     df_columns = ['Race','Gender','Insurance Type','Grant Req Date','Payment Date']
     df = subset_df(df=data_c,column='Payment Date',condition='', op='notna')[df_columns] 
-    df['DaysTillPaid']  =  (df['Payment Date'] - df['Grant Req Date'])
+    df['DaysTillPaid']  =  (df['Payment Date'] - df['Grant Req Date']).dt.days
     
     if show_by_pay_dur:
         df_columns =  ['Race','Gender','Insurance Type','DaysTillPaid']
