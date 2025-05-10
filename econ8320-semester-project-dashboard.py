@@ -427,7 +427,7 @@ elif selected == "Demographics":
         df_columns = ['DaysTillPaid']
         
     df = df[df_columns]
-    df_filtered_demography = df[df['DaysTillPaid'] >= pd.Timedelta(days=0)].groupby(df_columns)['DaysTillPaid'].count().sort_values(ascending=False).reset_index(name='Count')
+    df_filtered_demography = df[df['DaysTillPaid'] >= 0].groupby(df_columns)['DaysTillPaid'].count().sort_values(ascending=False).reset_index(name='Count')
     st.dataframe(df_filtered_demography)
 
     #Create a page showing how many patients did not use their full grant amount in a given application year. 
