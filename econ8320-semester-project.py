@@ -54,9 +54,34 @@ from datetime import datetime
 #                                                                                       #
 # --------------------------------------------------------------------------------------#
 #   
-#   
+#   Main Functions:
+#   load_orig - Loads the original data file to data frame called database_orig
+#   create_clean - Starts the cleanup process on database_orig and loads into
+#                  data frame called database_clean
+#########################################################################################
+#  other functions:
+#  clean_zip - Takes any string input. Removes non digit characters and keeps first 5  
+#              digitis
+#  remap_column 
+#   This is the heart of the cleanup functions. 
+#   - Maps the column values to valid values
+#   - If mapping doesn't exists - predicts valid values
+#   - If value is date - converts to valid value per mapping
+#   - If value is NaN - converts to valid value per mapping
+#   - If Option to save original value - retains the original value in specified field
 #
-
+#  clean_currency_column: 
+#   Cleans up a currency column:
+#   - Removes dollar signs, commas, spaces, etc.
+#   - Converts to float
+#   - Handles missing or invalid values 
+# clean_and_convert_to_float
+#  Cleans up a column by
+#  - Removing non-numeric characters (e.g., dollar signs, commas).
+#  - Converts the column values to float.
+#  - Handles invalid or missing values by converting them to NaN.
+#
+         
 
 
 class hopeFoundationCancerDatabase(object):
@@ -173,7 +198,7 @@ class hopeFoundationCancerDatabase(object):
             try:
                 return float(val)
             except ValueError:
-                return np.nan
+                return float(np.nan)
         
         df[column_name] = df[column_name].apply(clean_value)
         return df
@@ -220,17 +245,24 @@ class hopeFoundationCancerDatabase(object):
         return df
 
     def clean_datafile(self,df):
+
+        # Convert Generic Values to Consistent Case
+        # Remove any leading and trailing white spaces
+        #------------------------------------------------
         df = df.replace(r'(?i)^missing$', np.nan, regex=True)
         df = df.replace(r'(?i)^yes$', 'Yes', regex=True)
         df = df.replace(r'(?i)^no$', 'No', regex=True)
         df = self.replace_whitespace_with_nan(df)
         df = self.trim_whitespace(df)
 
-        df['Patient ID#'] = df['Patient ID#'].astype(int)
-        df['Grant Req Date'] = pd.to_datetime(df['Grant Req Date'])
-        df['App Year'] = df['App Year'].astype(int)
-        df['Remaining Balance'] = df['Remaining Balance'].astype(float,2)
-        df['Pt City'] = df['Pt City'].astype(str)
+        ## Data Type Conversion per Data Dictionary
+        #---------------------------------------------------------
+        df = self.set_datatype(df)
+        #df['Patient ID#'] = df['Patient ID#'].astype(int)
+        #df['Grant Req Date'] = pd.to_datetime(df['Grant Req Date'])
+        #df['App Year'] = df['App Year'].astype(int)
+        #df['Remaining Balance'] = df['Remaining Balance'].astype(float,2)
+        #df['Pt City'] = df['Pt City'].astype(str)
                 
         valid_requst_status = ['Approved', 'Pending', 'Denied']
         df = self.validate_values(df,'Request Status',valid_requst_status)
@@ -391,13 +423,13 @@ class hopeFoundationCancerDatabase(object):
         }
         df = self.remap_column(df,'Insurance Type',insurance_type_map)
 
-        df['Household Size'] = df['Household Size'].astype('Int64')
+        #df['Household Size'] = df['Household Size'].astype('Int64')
 
         df = self.clean_currency_column(df,'Total Household Gross Monthly Income')
-        df['Total Household Gross Monthly Income'] = df['Total Household Gross Monthly Income'].astype('Float64')
+        #df['Total Household Gross Monthly Income'] = df['Total Household Gross Monthly Income'].astype('Float64')
 
         df = self.clean_and_convert_to_float(df, 'Distance roundtrip/Tx')
-        df['Distance roundtrip/Tx'] = df['Distance roundtrip/Tx'].astype('Float64')
+        #df['Distance roundtrip/Tx'] = df['Distance roundtrip/Tx'].astype('Float64')
 
         expense_category_map = {
             'valid_vals': {
