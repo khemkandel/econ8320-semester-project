@@ -101,7 +101,7 @@ def subset_df(df, column, condition, op='=='):
 # change text, alignment, color , font size. With this function all that can be managed
 #---------------------------------------------------------
 
-def custom_header(text, size=20, weight='bold', color='#000000',align='left', icon=None):
+def custom_header(text, size=20, weight='normal', color='#000000',align='left', icon=None):
     """
     Display a custom styled header in Streamlit.
     
@@ -185,9 +185,9 @@ with st.sidebar:
 ##-------------------------------------------------------------------------------------------------------##
 if selected == "Overview":
 
-    custom_header(text="Amount Distribution by Year",align='center')
+    custom_header(text="Amount Distribution by Year",align='center',size=35,color='#8bc891')
     r1col1,r1col2 = st.columns(2)
-    custom_header(text="People we have Helped",align='center')
+    custom_header(text="Transforming Lives Through Support",align='center',size=35,color='#8bc891')
     r2col1, r2col2 = st.columns(2)
 
     
@@ -263,12 +263,12 @@ if selected == "Overview":
 ##---------------------------------------------------------------------------------------------------------------------------##
 elif selected == "Last Year - Overview":
     year = datetime.now().year - 1
-    st.title("📈 Year in Review " + str(year))
+    custom_header(text="Year in Review " + str(year),align='center',size=35,color='#8bc891')
 
     by_columns = ['Patient ID#','Request Status','Application Signed?']
     df = data_c[data_c['Grant Req Date'].dt.year == (year)][by_columns].drop_duplicates()
     totalRequests = len(df)
-    custom_header(text="Patient Approval ", size=20, weight='bold', color='#000000',align='center', icon=None)
+    custom_header(text="Patient Approval ", size=25, color='#788479',align='center', icon=None)
 
     show_by_breakdown = st.checkbox('Break by Application Signed Status',value=False)
     if show_by_breakdown:
@@ -313,7 +313,7 @@ elif selected == "Last Year - Overview":
     by_columns = ['Type of Assistance (CLASS)','Race','Gender','Amount']
     df = data_c[(data_c['Amount'] > 0) & (data_c['Payment Date'].dt.year == year)][by_columns]
     total_paid = df['Amount'].sum().round(2)
-    custom_header(text="Amount Paid", size=20, weight='bold', color='#000000', align='center', icon=None)
+    custom_header(text="Amount Paid", size=25, color='#788479', align='center', icon=None)
     
     # Checkbox to filter
     show_by_total_paid = st.checkbox('Breakdown by Demography',value=False)
@@ -362,7 +362,7 @@ elif selected == "Last Year - Overview":
 elif selected == "Request Status":
 
 
-    st.title("📈 Request Ready for Review ")
+    custom_header(text="Request Ready for Review ",align='center',size=35,color='#8bc891')
     df = subset_df(df=data_c,column='Request Status',condition="Approved",op='==')
     # Dropdown to select a category
     category_options = sorted(df['Application Signed?'].unique())
@@ -411,7 +411,7 @@ elif selected == "Data Quality":
 
     # Display nicely in Streamlit
     #custom_header(text="Data Quality Summary", size=20, weight='bold', color='#000000',align='center', icon=None)
-    st.title("Data Quality Summary")
+    custom_header(text="Data Quality Summary",align='center',size=35,color='#8bc891')
     st.table(summary_df.reset_index(drop=True)) 
 
     
@@ -421,7 +421,7 @@ elif selected == "Data Quality":
 #   In other words, break out how much support is offered by the listed demographics.   #
 #---------------------------------------------------------------------------------------#
 elif selected == "Demographics":  
-    st.title("Demographics Information")
+    custom_header(text="Demographics Information",align='center',size=35,color='#8bc891')
     category_options = ['Race','Gender','Insurance Type']
     selected_category = st.selectbox("Select Demographic Category", category_options,index=0)
 
@@ -440,7 +440,7 @@ elif selected == "Demographics":
 
 
     #Create a page showing how long it takes between when we receive a patient request and actually send support.
-    custom_header(text="Approval to Payment Duration",align='center')
+    custom_header(text="Approval to Payment Duration",size=25, color='#788479',align='center', icon=None)
 
     # Checkbox to filter
     show_by_pay_dur = st.checkbox('Break by Demographics',value=False)
@@ -460,14 +460,14 @@ elif selected == "Demographics":
 
     #Create a page showing how many patients did not use their full grant amount in a given application year. 
     
-    custom_header(text="Unused Funds Per Patients By Application Year",align='center')
+    custom_header(text="Unused Funds Per Patients By Application Year",size=25, color='#788479',align='center', icon=None)
     by_columns = ['App Year']
     df = data_c[data_c['Remaining Balance'] > 0].groupby(by_columns)['App Year'].size().sort_values(ascending=False).reset_index(name='# of Accounts')
     st.dataframe(df)
 
     #What are the average amounts given by assistance type? This would help us in terms of budgeting and determining future programming needs.
     # Checkbox to filter
-    custom_header(text="Total Amount Paid by Assistance Type",align='center')
+    custom_header(text="Total Amount Paid by Assistance Type",size=25, color='#788479',align='center', icon=None)
     show_by_appyear = st.checkbox('Break by AppYear',value=False)
     if show_by_appyear:
         by_columns = ['Type of Assistance (CLASS)','App Year']
