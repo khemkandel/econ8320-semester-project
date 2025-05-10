@@ -6,4 +6,4 @@ streamlit
 pyarrow
 streamlit-option-menu
 plotly.express
-geopy.geocoders
+#geopy.geocoders
