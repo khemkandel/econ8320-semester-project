@@ -145,7 +145,6 @@ st.markdown(
     [data-testid="stAppViewContainer"] {
         background-color: #fafaf3 !important; /* Change this to your preferred background color */
     }
-
     [data-testid="stSidebar"] {
         background-color: #ededdd; /* Change this color to your preferred background color */
         color: white; /* Text color */
