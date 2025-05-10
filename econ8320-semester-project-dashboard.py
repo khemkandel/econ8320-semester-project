@@ -45,6 +45,7 @@ import plotly.express as px
 
 
 
+
 # Function that allows you to get the subset of a table 
 #-----------------------------------------------------------
 
@@ -155,6 +156,7 @@ with st.sidebar:
 
 ##              SUMMARY OF IMPACT AND PROGRESS THAT CAN BE SHOWN TO STAKEHOLDERS IN THE FOUNDATION       ##
 ##-------------------------------------------------------------------------------------------------------##
+st.set_page_config(layout="wide")
 if selected == "Overview":
 
     custom_header(text="Amount Distribution by Year",align='center')
