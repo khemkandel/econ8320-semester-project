@@ -136,6 +136,33 @@ def styled_text(text, size=16, color="black", weight="normal"):
 data_o = pd.read_excel("./database_original_latest.xlsx")
 data_c = pd.read_excel("./database_clean_latest.xlsx")
 
+st.set_page_config(layout="wide")
+# Custom CSS for sidebar background
+st.markdown(
+    """
+    <style>
+    /* Main Panel Background Color */
+    [data-testid="stAppViewContainer"] {
+        background-color: #fafaf3 !important; /* Change this to your preferred background color */
+    }
+
+    [data-testid="stSidebar"] {
+        background-color: #ededdd; /* Change this color to your preferred background color */
+        color: white; /* Text color */
+    }
+    [data-testid="stSidebarUserContent"] ul.nav > li > a {
+        color: blue !important; /* Link color */
+    }
+    [data-testid="stSidebarUserContent"] .nav-link:hover {
+        background-color: blue !important; /* Hover background color */
+        color: blue !important; /* Hover text color */
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+
 
 # Control Left Navaigation Panel
 #-------------------------------#
@@ -150,13 +177,13 @@ with st.sidebar:
 )
 
 
+
 # Main Content Based on Selection
 #--------------------------------#
 
 
 ##              SUMMARY OF IMPACT AND PROGRESS THAT CAN BE SHOWN TO STAKEHOLDERS IN THE FOUNDATION       ##
 ##-------------------------------------------------------------------------------------------------------##
-st.set_page_config(layout="wide")
 if selected == "Overview":
 
     custom_header(text="Amount Distribution by Year",align='center')
