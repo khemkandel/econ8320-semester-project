@@ -528,6 +528,7 @@ elif selected == "Demographics":
     else:
         by_columns = ['Type of Assistance (CLASS)']
         df = data_c[data_c['Amount'] > 0].groupby(by_columns)['Amount'].sum().reset_index(name='Total Amount').sort_values(by='Total Amount', ascending=False)
+        df = df.reset_index(drop=True)
         #df = df.sort_values(by='Amount', ascending=False)
         st.dataframe(df)
  
