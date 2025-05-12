@@ -524,23 +524,7 @@ elif selected == "Demographics":
         by_columns = ['Type of Assistance (CLASS)']
         df = data_c[data_c['Amount'] > 0].groupby(by_columns)['Amount'].sum()
         st.dataframe(df)
-
-
-    df = data_c.groupby(['Type of Assistance (CLASS)','App Year'])['Amount'].sum().reset_index()
-    fig = px.bar(
-        df,
-        x='App Year',
-        y='Amount',
-        color='Type of Assistance (CLASS)',         # distinguishes bars side-by-side
-        barmode='group'         # enables side-by-side bars
-    )
-    fig.update_layout(showlegend=False)
-    st.plotly_chart(fig, use_container_width=True)
-
-
-
-
-    
+ 
 
 else:
    st.write("The END")
