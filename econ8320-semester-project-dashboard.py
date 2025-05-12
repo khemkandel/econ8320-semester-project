@@ -216,22 +216,9 @@ if selected == "Overview":
         by_columns = ['Year','Amount']
         df = df[by_columns].copy()
 
-
-        # # Extract year safely
-        # df['Year'] = pd.to_datetime(df['Payment Date'], errors='coerce').dt.year
-        
-        # # Convert to Int (drop decimals), then to string, replacing NaNs with 'unknown'
-        # df['Year'] = df['Year'].apply(lambda x: str(int(x)) if pd.notnull(x) else 'unknown')
-       
-        # # Create a new Colum
-        # df['Year1'] = pd.to_datetime(df['Grant Req Date'], errors='coerce').dt.year + ( df['App Year'] - 1)
-        # # Assign value of Year1 to Year2 if Year1 is 'unknown'
-        # df['Year'] = np.where(df['Year'] == 'unknown', df['Year1'], df['Year'])
-
         # Filter and group
         df = df[df['Amount'] > 0].groupby('Year')['Amount'].sum()
         st.bar_chart(df)
-        #st.dataframe(df)
 
     with r1col2:
         df_reset = df.reset_index()
@@ -523,10 +510,37 @@ elif selected == "Demographics":
     show_by_appyear = st.checkbox('Break by AppYear',value=False)
     if show_by_appyear:
         by_columns = ['Type of Assistance (CLASS)','App Year']
+        df = data_c[data_c['Amount'] > 0].groupby(by_columns)['Amount'].sum().reset_index()
+        fig = px.bar(
+            df,
+            x='App Year',
+            y='Amount',
+            color='Type of Assistance (CLASS)',         # distinguishes bars side-by-side
+            barmode='group'                             # enables side-by-side bars
+        )
+        fig.update_layout(showlegend=True)
+        st.plotly_chart(fig, use_container_width=True)
     else:
         by_columns = ['Type of Assistance (CLASS)']
-    df = data_c[data_c['Amount'] > 0].groupby(by_columns)['Amount'].sum()
-    st.dataframe(df)
+        df = data_c[data_c['Amount'] > 0].groupby(by_columns)['Amount'].sum()
+        st.dataframe(df)
+
+
+    df = data_c.groupby(['Type of Assistance (CLASS)','App Year'])['Amount'].sum().reset_index()
+    fig = px.bar(
+        df,
+        x='App Year',
+        y='Amount',
+        color='Type of Assistance (CLASS)',         # distinguishes bars side-by-side
+        barmode='group'         # enables side-by-side bars
+    )
+    fig.update_layout(showlegend=False)
+    st.plotly_chart(fig, use_container_width=True)
+
+
+
+
+    
 
 else:
    st.write("The END")
