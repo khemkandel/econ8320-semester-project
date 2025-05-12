@@ -232,7 +232,7 @@ class hopeFoundationCancerDatabase(object):
 
     def set_datatype(self,df):
         df['Patient ID#'] = df['Patient ID#'].astype(int)
-        df['Grant Req Date'] = pd.to_datetime(df['Grant Req Date']).dt.strftime('%Y-%m-%d')
+        df['Grant Req Date'] = pd.to_datetime(df['Grant Req Date'])
         df['App Year'] = df['App Year'].astype(int)
         df['Remaining Balance'] = df['Remaining Balance'].astype(float,2)
         df['Payment Date'] = pd.to_datetime(df['Payment Submitted?'], errors='coerce')
