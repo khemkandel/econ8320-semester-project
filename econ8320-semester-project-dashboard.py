@@ -519,7 +519,11 @@ elif selected == "Funds Distributions":
                 fig = px.bar(
                     df_filtered_demography,
                     x='DaysTillPaid',
-                    y='Count'
+                    y='Count',
+                    labels = {
+                        'DaysTillPaid' : 'Total Duration for Payment',
+                        'Count' : 'Total Transactions'
+                    }
                 )
                 fig.update_layout(showlegend=False)
                 st.plotly_chart(fig, use_container_width=True)
