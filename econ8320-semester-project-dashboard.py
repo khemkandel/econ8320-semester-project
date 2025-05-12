@@ -579,6 +579,7 @@ elif selected == "Demographics":
 
 
     fig = px.box(df, y='Total Household Gross Monthly Income')
-    fig.show()
+    st.plotly_chart(fig)
+
 else:
    st.write("The END")
