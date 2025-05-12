@@ -193,9 +193,9 @@ with st.sidebar:
 ##-------------------------------------------------------------------------------------------------------##
 if selected == "Overview":
 
-    custom_header(text="Amount Distribution by Year",align='center',size=35,color='#8bc891')
+    custom_header(text="Amount Distribution by Year",align='center',size=35,color='#94cd5f')
     r1col1,r1col2 = st.columns(2)
-    custom_header(text="Transforming Lives Through Support",align='center',size=35,color='#8bc891')
+    custom_header(text="Transforming Lives Through Support",align='center',size=35,color='#94cd5f')
     r2col1, r2col2 = st.columns(2)
     
     with r1col1:
@@ -290,7 +290,7 @@ if selected == "Overview":
 ##---------------------------------------------------------------------------------------------------------------------------##
 elif selected == "Last Year - Overview":
     year = datetime.now().year - 1
-    custom_header(text="Year in Review " + str(year),align='center',size=35,color='#8bc891')
+    custom_header(text="Year in Review " + str(year),align='center',size=35,color='#94cd5f')
 
     by_columns = ['Patient ID#','Request Status','Application Signed?']
     df = data_c[data_c['Grant Req Date'].dt.year == (year)][by_columns].drop_duplicates()
@@ -389,7 +389,7 @@ elif selected == "Last Year - Overview":
 elif selected == "Request Status":
 
 
-    custom_header(text="Request Ready for Review ",align='center',size=35,color='#8bc891')
+    custom_header(text="Request Ready for Review ",align='center',size=35,color='#94cd5f')
     df = subset_df(df=data_c,column='Request Status',condition="Approved",op='==')
     # Dropdown to select a category
     category_options = sorted(df['Application Signed?'].unique())
@@ -438,7 +438,7 @@ elif selected == "Data Quality":
 
     # Display nicely in Streamlit
     #custom_header(text="Data Quality Summary", size=20, weight='bold', color='#000000',align='center', icon=None)
-    custom_header(text="Data Quality Summary",align='center',size=35,color='#8bc891')
+    custom_header(text="Data Quality Summary",align='center',size=35,color='#94cd5f')
     st.table(summary_df.reset_index(drop=True)) 
 
     
@@ -448,7 +448,7 @@ elif selected == "Data Quality":
 #   In other words, break out how much support is offered by the listed demographics.   #
 #---------------------------------------------------------------------------------------#
 elif selected == "Demographics":  
-    custom_header(text="Demographics Information",align='center',size=35,color='#8bc891')
+    custom_header(text="Demographics Information",align='center',size=35,color='#94cd5f')
     category_options = ['Race','Gender','Insurance Type']
     selected_category = st.selectbox("Select Demographic Category", category_options,index=0)
 
