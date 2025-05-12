@@ -560,27 +560,29 @@ elif selected == "Funds Distributions":
             st.dataframe(df)
 
 elif selected == "Demographics":  
-    custom_header(text="Demographics Information",align='center',size=35,color='#94cd5f')
-    category_options = ['Race','Gender','Insurance Type']
-    selected_category = st.selectbox("Select Demographic Category", category_options,index=0)
+    c1 = st.container()
+    with c1:
+        custom_header(text="Demographics Information",align='center',size=35,color='#94cd5f')
+        category_options = ['Race','Gender','Insurance Type']
+        selected_category = st.selectbox("Select Demographic Category", category_options,index=0)
 
-    sub_category_options = sorted(data_c[selected_category].unique())
-    selected_sub_category = st.selectbox("Sub Category", sub_category_options,index=0)
+        sub_category_options = sorted(data_c[selected_category].unique())
+        selected_sub_category = st.selectbox("Sub Category", sub_category_options,index=0)
 
-    df_columns = category_options.copy()
-    df_columns.append('Amount')
-    df = subset_df(df=data_c, column='Amount',condition=0,op='>')[df_columns] 
+        df_columns = category_options.copy()
+        df_columns.append('Amount')
+        df = subset_df(df=data_c, column='Amount',condition=0,op='>')[df_columns] 
 
-    df_columns_groupby = [selected_category]
-    df_columns_groupby = df_columns_groupby + list(set(df_columns_groupby).symmetric_difference(set(category_options)))
-    df_filtered_demography = df[df[selected_category] == selected_sub_category].groupby(df_columns_groupby)['Amount'].sum().sort_values(ascending=False)
-    #st.write("selected_category  is " + str(selected_category) + "selected_sub_category" + str(selected_sub_category))
-    st.dataframe(df_filtered_demography)
-    
-    df_columns = ['Patient ID#',selected_category,'Total Household Gross Monthly Income']
-    df = subset_df(df=data_c, column=selected_category,condition=selected_sub_category,op='==')[df_columns] 
-    df = df[df_columns].groupby(df_columns)['Patient ID#'].count().sort_values(ascending=False).reset_index(name='Total Application Requests')
-    fig = px.box(df, y='Total Household Gross Monthly Income')
-    st.plotly_chart(fig)
+        df_columns_groupby = [selected_category]
+        df_columns_groupby = df_columns_groupby + list(set(df_columns_groupby).symmetric_difference(set(category_options)))
+        df_filtered_demography = df[df[selected_category] == selected_sub_category].groupby(df_columns_groupby)['Amount'].sum().sort_values(ascending=False)
+        #st.write("selected_category  is " + str(selected_category) + "selected_sub_category" + str(selected_sub_category))
+        st.dataframe(df_filtered_demography)
+        
+        df_columns = ['Patient ID#',selected_category,'Total Household Gross Monthly Income']
+        df = subset_df(df=data_c, column=selected_category,condition=selected_sub_category,op='==')[df_columns] 
+        df = df[df_columns].groupby(df_columns)['Patient ID#'].count().sort_values(ascending=False).reset_index(name='Total Application Requests')
+        fig = px.box(df, y='Total Household Gross Monthly Income')
+        st.plotly_chart(fig)
 else:
    st.write("The END")
