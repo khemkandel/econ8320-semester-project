@@ -499,13 +499,9 @@ elif selected == "Demographics":
         df_filtered_demography = df[df['DaysTillPaid'] >= 0].groupby(df_columns)['DaysTillPaid'].count().sort_values(ascending=False).reset_index(name='Count')
         #st.line_chart(df_filtered_demography,x='DaysTillPaid',y='Count')
 
-        # Create Line Chart
+
         fig = px.line(df_filtered_demography, x='DaysTillPaid', y='Count')
-
-        # Set x-axis to start at -1
-        fig.update_xaxes(range=[-1, df['YeDaysTillPaidar'].max()])
-
-        # Display the chart in Streamlit
+        fig.update_xaxes(range=[-1, df['DaysTillPaid'].max()])
         st.plotly_chart(fig)
 
 
