@@ -461,8 +461,7 @@ elif selected == "Data Quality":
 #---------------------------------------------------------------------------------------#
 elif selected == "Funds Distributions":  
     custom_header(text="Funds Distributions",align='center',size=35,color='#94cd5f')
-    #Create a page showing how long it takes between when we receive a patient request and actually send support.
-    custom_header(text="Approval to Payment Duration",size=25, color='#386d06',align='center', icon=None)
+
 
     c = st.container()
     with c:
@@ -493,31 +492,34 @@ elif selected == "Funds Distributions":
                 fig.update_layout(showlegend=True)
                 st.plotly_chart(fig, use_container_width=True)
 
+    c2 = st.container()
+    with c2:
+        #Create a page showing how long it takes between when we receive a patient request and actually send support.
+        custom_header(text="Approval to Payment Duration",size=25, color='#386d06',align='center', icon=None)
+        col1, col2 = st.columns(2)
+            
+        # # Checkbox to filter
+        show_by_pay_dur = st.checkbox('Break by Demographics',value=False)
 
-
-
-    # Checkbox to filter
-    show_by_pay_dur = st.checkbox('Break by Demographics',value=False)
-
-    df_columns = ['Race','Gender','Insurance Type','Grant Req Date','Payment Date']
-    df = subset_df(df=data_c,column='Payment Date',condition='', op='notna')[df_columns] 
-    df['DaysTillPaid']  =  (df['Payment Date'] - df['Grant Req Date']).dt.days
-    
-    if show_by_pay_dur:
-        df_columns =  ['Race','Gender','Insurance Type','DaysTillPaid']
-        df = df[df_columns]
-        df_filtered_demography = df[df['DaysTillPaid'] >= 0].groupby(df_columns)['DaysTillPaid'].count().sort_values(ascending=False).reset_index(name='Count')
-        st.dataframe(df_filtered_demography)
-    else:
-        df_columns = ['DaysTillPaid']
-        df = df[df_columns]
-        df_filtered_demography = df[df['DaysTillPaid'] >= 0]
-        # Categorize values over 30 days as "Over 30 Days"
-        #df_filtered_demography['DaysTillPaid'] = np.where(df_filtered_demography['DaysTillPaid'] > 30, 'Over 30 Days', df_filtered_demography['DaysTillPaid'])
-        df_filtered_demography = df_filtered_demography.groupby(df_columns)['DaysTillPaid'].count().sort_values(ascending=False).reset_index(name='Count')
-        #st.bar_chart(df_filtered_demography,x='DaysTillPaid',y='Count')
-        # Display the bar chart
-        st.bar_chart(df_filtered_demography.set_index('DaysTillPaid'))
+        df_columns = ['Race','Gender','Insurance Type','Grant Req Date','Payment Date']
+        df = subset_df(df=data_c,column='Payment Date',condition='', op='notna')[df_columns] 
+        df['DaysTillPaid']  =  (df['Payment Date'] - df['Grant Req Date']).dt.days
+        with col1:
+            if show_by_pay_dur:
+                df_columns =  ['Race','Gender','Insurance Type','DaysTillPaid']
+                df = df[df_columns]
+                df_filtered_demography = df[df['DaysTillPaid'] >= 0].groupby(df_columns)['DaysTillPaid'].count().sort_values(ascending=False).reset_index(name='Count')
+                st.dataframe(df_filtered_demography)
+            else:
+                df_columns = ['DaysTillPaid']
+                df = df[df_columns]
+                df_filtered_demography = df[df['DaysTillPaid'] >= 0]
+                # Categorize values over 30 days as "Over 30 Days"
+                #df_filtered_demography['DaysTillPaid'] = np.where(df_filtered_demography['DaysTillPaid'] > 30, 'Over 30 Days', df_filtered_demography['DaysTillPaid'])
+                df_filtered_demography = df_filtered_demography.groupby(df_columns)['DaysTillPaid'].count().sort_values(ascending=False).reset_index(name='Count')
+                #st.bar_chart(df_filtered_demography,x='DaysTillPaid',y='Count')
+                # Display the bar chart
+                st.bar_chart(df_filtered_demography.set_index('DaysTillPaid'))
 
 
 
