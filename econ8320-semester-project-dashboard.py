@@ -580,7 +580,6 @@ elif selected == "Demographics":
         st.dataframe(df_filtered_demography)
         df_columns = ['Patient ID#',selected_category,'Total Household Gross Monthly Income']
         df = subset_df(df=data_c, column=selected_category,condition=selected_sub_category,op='==')[df_columns] 
-        df['Total Household Gross Monthly Income'] = df['Total Household Gross Monthly Income'].round(2)
         df = df[df_columns].groupby(df_columns)['Patient ID#'].count().sort_values(ascending=False).reset_index(name='Total Application Requests')
 
         col1,col2 = st.columns(2)    
@@ -589,6 +588,7 @@ elif selected == "Demographics":
             st.plotly_chart(fig)
 
         with col2:
+            df['Total Household Gross Monthly Income'] = df['Total Household Gross Monthly Income'].round(2)
             df = df.sort_values(by='Total Household Gross Monthly Income',ascending=False)
             st.dataframe(df)
 
