@@ -498,8 +498,8 @@ elif selected == "Demographics":
         df = df[df_columns]
         df_filtered_demography = df[df['DaysTillPaid'] >= 0]
         # Categorize values over 30 days as "Over 30 Days"
-        df_filtered_demography['DaysTillPaid'] = np.where(df['DaysTillPaid'] > 30, 'Over 30 Days', df['DaysTillPaid'])
-        df_filtered_demography = df.groupby(df_columns)['DaysTillPaid'].count().sort_values(ascending=False).reset_index(name='Count')
+        df_filtered_demography['DaysTillPaid'] = np.where(df_filtered_demography['DaysTillPaid'] > 30, 'Over 30 Days', df_filtered_demography['DaysTillPaid'])
+        df_filtered_demography = df_filtered_demography.groupby(df_columns)['DaysTillPaid'].count().sort_values(ascending=False).reset_index(name='Count')
         st.bar_chart(df_filtered_demography,x='DaysTillPaid',y='Count')
 
 
