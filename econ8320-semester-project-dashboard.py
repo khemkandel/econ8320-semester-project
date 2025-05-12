@@ -502,7 +502,11 @@ elif selected == "Demographics":
     custom_header(text="Unused Funds Per Patients By Application Year",size=25, color='#386d06',align='center', icon=None)
     by_columns = ['App Year']
     df = data_c[data_c['Remaining Balance'] > 0].groupby(by_columns)['App Year'].size().sort_values(ascending=False).reset_index(name='# of Accounts')
-    st.dataframe(df)
+
+    fig = px.pie(df, names='App Year', values='# of Accounts')
+    fig.update_layout(showlegend=True)
+    st.plotly_chart(fig)
+    #st.dataframe(df)
 
     #What are the average amounts given by assistance type? This would help us in terms of budgeting and determining future programming needs.
     # Checkbox to filter
