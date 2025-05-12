@@ -509,13 +509,13 @@ elif selected == "Demographics":
     custom_header(text="Total Amount Paid by Assistance Type",size=25, color='#386d06',align='center', icon=None)
     show_by_appyear = st.checkbox('Break by AppYear',value=False)
     if show_by_appyear:
-        by_columns = ['App Year','Type of Assistance (CLASS)']
+        by_columns = ['Type of Assistance (CLASS)','App Year']
         df = data_c[data_c['Amount'] > 0].groupby(by_columns)['Amount'].sum().reset_index()
         fig = px.bar(
             df,
-            x='Type of Assistance (CLASS)',
+            x='App Year',
             y='Amount',
-            color='App Year',                           # distinguishes bars side-by-side
+            color='Type of Assistance (CLASS)',         # distinguishes bars side-by-side
             barmode='group'                             # enables side-by-side bars
         )
         fig.update_layout(showlegend=True)
