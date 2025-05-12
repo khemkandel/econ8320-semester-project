@@ -423,7 +423,7 @@ elif selected == "Data Quality":
 
     totalPaymentDate =  data_o['Payment Submitted?'].count()
     totalInvalidPaymentDate =  data_o['Payment Submitted?'].str.lower().eq('yes').sum()
-    totalInvalidPaymentDatePerc = round(float(totalInvalidRequestStatus / totalInvalidPaymentDate), 2) if totalPaymentDate > 0 else 0.0
+    totalInvalidPaymentDatePerc = round(float(totalInvalidPaymentDate / totalPaymentDate), 2) if totalPaymentDate > 0 else 0.0
 
 
 
@@ -443,6 +443,13 @@ elif selected == "Data Quality":
             'Payment Submitted?',
             'Application Signed (Approved only)'
         ],
+        'Total Recs': [
+            totalGrantReqDate,
+            totalRemaingBalance,
+            totalRequestStatus,
+            totalPaymentDate,
+            totalApplicationSigned
+        ],
         'Total Invalid Recs': [
             totalInvalidGrantReqDate,
             totalInvalidRemaingBalance,
@@ -450,12 +457,12 @@ elif selected == "Data Quality":
             totalInvalidPaymentDate,
             totalMissingApplicationSigned
         ],
-        'Invalid Records %': [
-            totalInvalidGrantReqDatePerc,
-            totalInvalidRemaingBalancePerc,
-            totalInvalidRequestStatusPerc,
-            totalInvalidPaymentDatePerc,
-            totalMissingApplicationSignedPerc
+        'Invalid Recs %': [
+            "{:.2%}".format(totalInvalidGrantReqDatePerc),
+            "{:.2%}".format(totalInvalidRemaingBalancePerc),
+            "{:.2%}".format(totalInvalidRequestStatusPerc),
+            "{:.2%}".format(totalInvalidPaymentDatePerc),
+            "{:.2%}".format(totalMissingApplicationSignedPerc)
         ]
     })
 
