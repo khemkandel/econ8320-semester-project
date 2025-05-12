@@ -397,6 +397,7 @@ elif selected == "Request Status":
 
     # Filter the DataFrame
     filtered_df = df[df['Application Signed?'] == selected_category]
+    filtered_df['Grant Req Date'] = pd.to_datetime(filtered_df['Grant Req Date']).dt.strftime('%Y-%m-%d')
 
     # Display the filtered DataFrame
     st.dataframe(filtered_df.reset_index(drop=True),height=500)
