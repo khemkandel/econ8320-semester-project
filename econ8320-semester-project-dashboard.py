@@ -489,6 +489,10 @@ elif selected == "Funds Distributions":
                     color='Type of Assistance (CLASS)',         # distinguishes bars side-by-side
                     barmode='group'                             # enables side-by-side bars
                 )
+                # Control X-axis breaks (ticks) using dtick
+                fig.update_xaxes(
+                    dtick=1  # Change this to your desired interval (e.g., 2, 5)
+                )
                 fig.update_layout(showlegend=True)
                 st.plotly_chart(fig, use_container_width=True)
 
