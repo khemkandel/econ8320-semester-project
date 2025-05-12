@@ -577,10 +577,10 @@ elif selected == "Demographics":
     #st.write("selected_category  is " + str(selected_category) + "selected_sub_category" + str(selected_sub_category))
     st.dataframe(df_filtered_demography)
     
-    df_columns = [selected_category,'Total Household Gross Monthly Income']
+    df_columns = ['Patient ID#',selected_category,'Total Household Gross Monthly Income']
     df = subset_df(df=data_c, column=selected_category,condition=selected_sub_category,op='==')[df_columns] 
-    df = df.groupby(df_columns)
-    fig = px.box(df_filtered_demography[df_filtered_demography['Total Household Gross Monthly Income'] > 0 ], y='Total Household Gross Monthly Income')
+    df = df[df_columns].groupby(df_columns)['Patient ID#'].count().sort_values(ascending=False).reset_index(name='Total Application Requests')
+    fig = px.box(df, y='Total Household Gross Monthly Income')
     st.plotly_chart(fig)
 
 else:
