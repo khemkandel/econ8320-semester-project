@@ -528,8 +528,6 @@ elif selected == "Funds Distributions":
                 fig.update_layout(showlegend=False)
                 st.plotly_chart(fig, use_container_width=True)
 
-
-
         with col2:
             #if show_by_pay_dur:
                 df_columns = ['Race','Gender','Insurance Type','Grant Req Date','Payment Date']
