@@ -578,7 +578,7 @@ elif selected == "Demographics":
     st.dataframe(df_filtered_demography)
 
 
-    fig = px.box(df, y='Total Household Gross Monthly Income')
+    fig = px.box(df[df['Total Household Gross Monthly Income'] > 0 ], y='Total Household Gross Monthly Income')
     st.plotly_chart(fig)
 
 else:
