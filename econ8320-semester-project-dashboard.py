@@ -576,5 +576,9 @@ elif selected == "Demographics":
     df_filtered_demography = df[df[selected_category] == selected_sub_category].groupby(df_columns_groupby)['Amount'].sum().sort_values(ascending=False)
     #st.write("selected_category  is " + str(selected_category) + "selected_sub_category" + str(selected_sub_category))
     st.dataframe(df_filtered_demography)
+
+
+    fig = px.box(df, y='Total Household Gross Monthly Income')
+    fig.show()
 else:
    st.write("The END")
