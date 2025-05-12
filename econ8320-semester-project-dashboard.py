@@ -469,9 +469,17 @@ elif selected == "Funds Distributions":
         #What are the average amounts given by assistance type? This would help us in terms of budgeting and determining future programming needs.
         # Checkbox to filter
         custom_header(text="Total Amount Paid by Assistance Type",size=25, color='#386d06',align='center', icon=None)
-        show_by_appyear = st.checkbox('Break by AppYear',value=False)
+        #show_by_appyear = st.checkbox('Break by AppYear',value=False)
         col1, col2 = st.columns(2)
         with col1:
+            #else:
+                by_columns = ['Type of Assistance (CLASS)']
+                df = data_c[data_c['Amount'] > 0].groupby(by_columns)['Amount'].sum().reset_index(name='Total Amount').sort_values(by='Total Amount', ascending=False)
+                df = df.reset_index(drop=True)
+                #df = df.sort_values(by='Amount', ascending=False)
+                st.dataframe(df)
+
+        with col2:
             #if show_by_appyear:
                 by_columns = ['Type of Assistance (CLASS)','App Year']
                 df = data_c[data_c['Amount'] > 0].groupby(by_columns)['Amount'].sum().reset_index()
@@ -484,13 +492,6 @@ elif selected == "Funds Distributions":
                 )
                 fig.update_layout(showlegend=True)
                 st.plotly_chart(fig, use_container_width=True)
-        with col2:
-            #else:
-                by_columns = ['Type of Assistance (CLASS)']
-                df = data_c[data_c['Amount'] > 0].groupby(by_columns)['Amount'].sum().reset_index(name='Total Amount').sort_values(by='Total Amount', ascending=False)
-                df = df.reset_index(drop=True)
-                #df = df.sort_values(by='Amount', ascending=False)
-                st.dataframe(df)
 
 
 
