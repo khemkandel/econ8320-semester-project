@@ -15,7 +15,7 @@ import subprocess
 import sys
 
 # List of required packages
-required_packages = ['pgeocode', 'openpyxl', 'pandas','numpy','re','operator','streamlit','datetime','pyarrow','streamlit_option_menu']
+required_packages = ['pgeocode', 'openpyxl', 'pandas','numpy','re','operator','streamlit','datetime','pyarrow','streamlit_option_menu','streamlit.components.v1']
 
 # Function to install missing packages
 def install(package):
@@ -42,6 +42,7 @@ import streamlit as st
 from datetime import datetime
 from streamlit_option_menu import option_menu
 import plotly.express as px
+import streamlit.components.v1 as components
 
 
 
@@ -399,7 +400,22 @@ elif selected == "Request Status":
     filtered_df = df[df['Application Signed?'] == selected_category]
 
     # Display the filtered DataFrame
-    st.dataframe(filtered_df.reset_index(drop=True),height=400)
+    st.dataframe(filtered_df.reset_index(drop=True))
+    # Inject JavaScript to set auto height
+    components.html(
+        """
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                let iframe = window.parent.document.querySelector('iframe[title="streamlitApp"]');
+                if (iframe) {
+                    // Adjust the height to 80% of the available screen
+                    iframe.style.height = (window.innerHeight * 0.8) + 'px';
+                }
+            });
+        </script>
+        """,
+        height=0,  # No height for the component itself
+    )
 
 #------------------------------------------------------------#    
 #                         REPORT MISSING DATA                #
