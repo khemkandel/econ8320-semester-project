@@ -582,6 +582,5 @@ elif selected == "Demographics":
     df = df[df_columns].groupby(df_columns)['Patient ID#'].count().sort_values(ascending=False).reset_index(name='Total Application Requests')
     fig = px.box(df, y='Total Household Gross Monthly Income')
     st.plotly_chart(fig)
-
 else:
    st.write("The END")
