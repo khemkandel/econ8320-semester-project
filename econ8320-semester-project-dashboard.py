@@ -499,7 +499,7 @@ elif selected == "Funds Distributions":
         col1, col2 = st.columns(2)
             
         # # Checkbox to filter
-            #show_by_pay_dur = st.checkbox('Break by Demographics',value=False)
+        #show_by_pay_dur = st.checkbox('Break by Demographics',value=False)
 
         df_columns = ['Race','Gender','Insurance Type','Grant Req Date','Payment Date']
         df = subset_df(df=data_c,column='Payment Date',condition='', op='notna')[df_columns] 
@@ -517,14 +517,12 @@ elif selected == "Funds Distributions":
                 # Display the bar chart
                 st.bar_chart(df_filtered_demography.set_index('DaysTillPaid'))
 
-        with col2:
-            #if show_by_pay_dur:
-                df_columns =  ['Race','Gender','Insurance Type','DaysTillPaid']
-                df = df[df_columns]
-                df_filtered_demography = df[df['DaysTillPaid'] >= 0].groupby(df_columns)['DaysTillPaid'].count().sort_values(ascending=False).reset_index(name='Count')
-                st.dataframe(df_filtered_demography)
-
-
+        # with col2:
+        #     #if show_by_pay_dur:
+        #         df_columns =  ['Race','Gender','Insurance Type','DaysTillPaid']
+        #         df = df[df_columns]
+        #         df_filtered_demography = df[df['DaysTillPaid'] >= 0].groupby(df_columns)['DaysTillPaid'].count().sort_values(ascending=False).reset_index(name='Count')
+        #         st.dataframe(df_filtered_demography)
 
 
 
