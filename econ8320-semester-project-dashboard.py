@@ -527,7 +527,8 @@ elif selected == "Demographics":
         st.plotly_chart(fig, use_container_width=True)
     else:
         by_columns = ['Type of Assistance (CLASS)']
-        df = (data_c[data_c['Amount'] > 0].groupby(by_columns)['Amount'].sum()).sort_values(by='Amount',ascending=False)
+        df = data_c[data_c['Amount'] > 0].groupby(by_columns)['Amount'].sum()
+        #df = df.sort_values(by='Amount', ascending=False)
         st.dataframe(df)
  
 
