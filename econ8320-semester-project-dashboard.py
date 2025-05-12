@@ -193,7 +193,7 @@ with st.sidebar:
 ##-------------------------------------------------------------------------------------------------------##
 if selected == "Overview":
 
-    custom_header(text="Amount Distribution by Year",align='center',size=35,color='#94cd5f')
+    custom_header(text="Annual Distribution of Funds",align='center',size=35,color='#94cd5f')
     r1col1,r1col2 = st.columns(2)
     custom_header(text="Transforming Lives Through Support",align='center',size=35,color='#94cd5f')
     r2col1, r2col2 = st.columns(2)
