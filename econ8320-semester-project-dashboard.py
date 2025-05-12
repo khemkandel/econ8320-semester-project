@@ -501,7 +501,7 @@ elif selected == "Demographics":
 
 
         fig = px.line(df_filtered_demography, x='DaysTillPaid', y='Count')
-        fig.update_xaxes(range=[-1, df['DaysTillPaid'].max()])
+        #fig.update_xaxes(range=[-1, df['DaysTillPaid'].max()])
         st.plotly_chart(fig)
 
 
