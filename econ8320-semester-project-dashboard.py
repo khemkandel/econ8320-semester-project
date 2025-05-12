@@ -500,7 +500,7 @@ elif selected == "Demographics":
         #st.line_chart(df_filtered_demography,x='DaysTillPaid',y='Count')
 
         # Create Line Chart
-        fig = px.line(df, x='YeDaysTillPaidar', y='Count')
+        fig = px.line(df_filtered_demography, x='YeDaysTillPaidar', y='Count')
 
         # Set x-axis to start at -1
         fig.update_xaxes(range=[-1, df['YeDaysTillPaidar'].max()])
