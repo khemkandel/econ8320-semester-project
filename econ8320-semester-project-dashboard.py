@@ -481,13 +481,13 @@ elif selected == "Funds Distributions":
             barmode='group'                             # enables side-by-side bars
         )
         fig.update_layout(showlegend=True)
-        c.st.plotly_chart(fig, use_container_width=True)
+        c.plotly_chart(fig, use_container_width=True)
     else:
         by_columns = ['Type of Assistance (CLASS)']
         df = data_c[data_c['Amount'] > 0].groupby(by_columns)['Amount'].sum().reset_index(name='Total Amount').sort_values(by='Total Amount', ascending=False)
         df = df.reset_index(drop=True)
         #df = df.sort_values(by='Amount', ascending=False)
-        c.st.dataframe(df)
+        c.dataframe(df)
 
 
 
