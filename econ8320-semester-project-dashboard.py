@@ -542,18 +542,22 @@ elif selected == "Funds Distributions":
                 st.dataframe(df_filtered_demography)
 
 
+    c3 = st.container()
+    with c3:
+        #Create a page showing how many patients did not use their full grant amount in a given application year. 
+        custom_header(text="Unused Funds Per Patients By Application Year",size=25, color='#386d06',align='center', icon=None)
+        by_columns = ['App Year']
+        df = data_c[data_c['Remaining Balance'] > 0].groupby(by_columns)['App Year'].size().sort_values(ascending=False).reset_index(name='# of Accounts')
 
-    #Create a page showing how many patients did not use their full grant amount in a given application year. 
-    
-    custom_header(text="Unused Funds Per Patients By Application Year",size=25, color='#386d06',align='center', icon=None)
-    by_columns = ['App Year']
-    df = data_c[data_c['Remaining Balance'] > 0].groupby(by_columns)['App Year'].size().sort_values(ascending=False).reset_index(name='# of Accounts')
+        col1, col2 = st.columns(2)
+        with col1:
+            fig = px.pie(df, names='App Year', values='# of Accounts')
+            fig.update_layout(showlegend=True,
+                            legend_title_text='Application Year')  # Set legend title here)
+            st.plotly_chart(fig)
 
-    fig = px.pie(df, names='App Year', values='# of Accounts')
-    fig.update_layout(showlegend=True,
-                      legend_title_text='Application Year')  # Set legend title here)
-    st.plotly_chart(fig)
-    #st.dataframe(df)
+        with col2:
+            st.dataframe(df)
 
 elif selected == "Demographics":  
     custom_header(text="Demographics Information",align='center',size=35,color='#94cd5f')
