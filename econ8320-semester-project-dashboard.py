@@ -393,7 +393,7 @@ elif selected == "Request Status":
     df = subset_df(df=data_c,column='Request Status',condition="Approved",op='==')
     # Dropdown to select a category
     category_options = sorted(df['Application Signed?'].unique())
-    selected_category = st.selectbox("Filter by Category", category_options,index=2)
+    selected_category = st.selectbox("Filter by Application Signed?", category_options,index=2)
 
     # Filter the DataFrame
     filtered_df = df[df['Application Signed?'] == selected_category]
