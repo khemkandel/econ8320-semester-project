@@ -129,12 +129,21 @@ def styled_text(text, size=16, color="black", weight="normal"):
     )
 
 
+# Function to replace 'unknown' Year with Year1 of the same patient where APP Year is 1
+def replace_unknown_year(group):
+    # Get the Year1 value for APP Year == 1 for this patient
+    year1_value = group.loc[group['App Year'] == 1, 'Year1'].values
+    if len(year1_value) > 0:  # If there is a value
+        group.loc[(group['Year'] == 'unknown'), 'Year'] = year1_value[0]
+    return group
+
 ############# EXECUTION STARTS HERE ############################
 #--------------------------------------------------------------#
 
 
 data_o = pd.read_excel("./database_original_latest.xlsx")
 data_c = pd.read_excel("./database_clean_latest.xlsx")
+
 
 st.set_page_config(layout="wide")
 # Custom CSS for sidebar background
@@ -176,7 +185,6 @@ with st.sidebar:
 )
 
 
-
 # Main Content Based on Selection
 #--------------------------------#
 
@@ -189,17 +197,36 @@ if selected == "Overview":
     r1col1,r1col2 = st.columns(2)
     custom_header(text="Transforming Lives Through Support",align='center',size=35,color='#8bc891')
     r2col1, r2col2 = st.columns(2)
-
     
     with r1col1:
-        by_columns = ['Payment Date', 'Amount']
+        
+        by_columns = ['Patient ID#','Payment Date','Grant Req Date', 'App Year','Amount']
         df = data_c[by_columns].copy()
-
         # Extract year safely
         df['Year'] = pd.to_datetime(df['Payment Date'], errors='coerce').dt.year
-
+        
         # Convert to Int (drop decimals), then to string, replacing NaNs with 'unknown'
         df['Year'] = df['Year'].apply(lambda x: str(int(x)) if pd.notnull(x) else 'unknown')
+       
+        # Create a new Colum
+        df['Year1'] = pd.to_datetime(df['Grant Req Date'], errors='coerce').dt.year + ( df['App Year'] - 1)
+        df = df.groupby('Patient ID#').apply(replace_unknown_year).reset_index(drop=True)
+        
+        by_columns = ['Payment Date', 'Amount']
+        by_columns = ['Payment Date','Grant Req Date', 'App Year','Amount']
+        df = [by_columns].copy()
+
+
+        # # Extract year safely
+        # df['Year'] = pd.to_datetime(df['Payment Date'], errors='coerce').dt.year
+        
+        # # Convert to Int (drop decimals), then to string, replacing NaNs with 'unknown'
+        # df['Year'] = df['Year'].apply(lambda x: str(int(x)) if pd.notnull(x) else 'unknown')
+       
+        # # Create a new Colum
+        # df['Year1'] = pd.to_datetime(df['Grant Req Date'], errors='coerce').dt.year + ( df['App Year'] - 1)
+        # # Assign value of Year1 to Year2 if Year1 is 'unknown'
+        # df['Year'] = np.where(df['Year'] == 'unknown', df['Year1'], df['Year'])
 
         # Filter and group
         df = df[df['Amount'] > 0].groupby('Year')['Amount'].sum()
