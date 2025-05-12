@@ -177,7 +177,7 @@ st.markdown(
 with st.sidebar:
     selected = option_menu(
     menu_title = "Hope Foundation",
-    options = ["Overview","Last Year - Overview", "Request Status", "Demographics", "Data Quality"],
+    options = ["Overview","Last Year - Overview", "Request Status", "Funds Distributions","Demographics", "Data Quality"],
     icons = ["house","rewind","activity","Population","	Validation/Test"],
     menu_icon = "cast",
     default_index = 0,
@@ -459,25 +459,8 @@ elif selected == "Data Quality":
 #   income size, insurance type, age, etc".                                             #
 #   In other words, break out how much support is offered by the listed demographics.   #
 #---------------------------------------------------------------------------------------#
-elif selected == "Demographics":  
-    custom_header(text="Demographics Information",align='center',size=35,color='#94cd5f')
-    category_options = ['Race','Gender','Insurance Type']
-    selected_category = st.selectbox("Select Demographic Category", category_options,index=0)
-
-    sub_category_options = sorted(data_c[selected_category].unique())
-    selected_sub_category = st.selectbox("Sub Category", sub_category_options,index=0)
-
-    df_columns = category_options.copy()
-    df_columns.append('Amount')
-    df = subset_df(df=data_c, column='Amount',condition=0,op='>')[df_columns] 
-
-    df_columns_groupby = [selected_category]
-    df_columns_groupby = df_columns_groupby + list(set(df_columns_groupby).symmetric_difference(set(category_options)))
-    df_filtered_demography = df[df[selected_category] == selected_sub_category].groupby(df_columns_groupby)['Amount'].sum().sort_values(ascending=False)
-    #st.write("selected_category  is " + str(selected_category) + "selected_sub_category" + str(selected_sub_category))
-    st.dataframe(df_filtered_demography)
-
-
+elif selected == "Funds Distribution":  
+    custom_header(text="Funds Distribution",align='center',size=35,color='#94cd5f')
     #Create a page showing how long it takes between when we receive a patient request and actually send support.
     custom_header(text="Approval to Payment Duration",size=25, color='#386d06',align='center', icon=None)
 
@@ -540,7 +523,24 @@ elif selected == "Demographics":
         df = df.reset_index(drop=True)
         #df = df.sort_values(by='Amount', ascending=False)
         st.dataframe(df)
- 
 
+
+elif selected == "Demographics":  
+    custom_header(text="Demographics Information",align='center',size=35,color='#94cd5f')
+    category_options = ['Race','Gender','Insurance Type']
+    selected_category = st.selectbox("Select Demographic Category", category_options,index=0)
+
+    sub_category_options = sorted(data_c[selected_category].unique())
+    selected_sub_category = st.selectbox("Sub Category", sub_category_options,index=0)
+
+    df_columns = category_options.copy()
+    df_columns.append('Amount')
+    df = subset_df(df=data_c, column='Amount',condition=0,op='>')[df_columns] 
+
+    df_columns_groupby = [selected_category]
+    df_columns_groupby = df_columns_groupby + list(set(df_columns_groupby).symmetric_difference(set(category_options)))
+    df_filtered_demography = df[df[selected_category] == selected_sub_category].groupby(df_columns_groupby)['Amount'].sum().sort_values(ascending=False)
+    #st.write("selected_category  is " + str(selected_category) + "selected_sub_category" + str(selected_sub_category))
+    st.dataframe(df_filtered_demography)
 else:
    st.write("The END")
