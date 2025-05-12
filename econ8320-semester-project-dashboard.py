@@ -588,6 +588,8 @@ elif selected == "Demographics":
             st.plotly_chart(fig)
 
         with col2:
+            # Ensure the column is numeric
+            df['Total Household Gross Monthly Income'] = pd.to_numeric(df['Total Household Gross Monthly Income'], errors='coerce')
             df['Total Household Gross Monthly Income'] = df['Total Household Gross Monthly Income'].round(2)
             df = df.sort_values(by='Total Household Gross Monthly Income',ascending=False)
             st.dataframe(df)
