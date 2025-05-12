@@ -468,7 +468,7 @@ elif selected == "Funds Distributions":
     with c:
         #What are the average amounts given by assistance type? This would help us in terms of budgeting and determining future programming needs.
         # Checkbox to filter
-        st.custom_header(text="Total Amount Paid by Assistance Type",size=25, color='#386d06',align='center', icon=None)
+        custom_header(text="Total Amount Paid by Assistance Type",size=25, color='#386d06',align='center', icon=None)
         show_by_appyear = st.checkbox('Break by AppYear',value=False)
         if show_by_appyear:
             by_columns = ['Type of Assistance (CLASS)','App Year']
