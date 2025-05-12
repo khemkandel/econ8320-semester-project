@@ -7,4 +7,4 @@ pyarrow
 streamlit-option-menu
 plotly.express
 #geopy.geocoders
-streamlit.components.v1
+streamlit.components
