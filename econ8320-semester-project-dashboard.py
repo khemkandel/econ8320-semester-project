@@ -444,11 +444,11 @@ elif selected == "Data Quality":
             'Application Signed (Approved only)'
         ],
         'Total Invalid Recs': [
-            "{:.2%}".format(totalInvalidGrantReqDate),
-           "{:.2%}".format(totalInvalidRemaingBalance),
-            "{:.2%}".format(totalInvalidRequestStatus),
-            "{:.2%}".format(totalInvalidPaymentDate),
-            "{:.2%}".format(totalMissingApplicationSigned)
+            "{}".format(totalInvalidGrantReqDate),
+            "{}".format(totalInvalidRemaingBalance),
+            "{}".format(totalInvalidRequestStatus),
+            "{}".format(totalInvalidPaymentDate),
+            "{}".format(totalMissingApplicationSigned)
         ],
         'Invalid Recs %': [
             "{:.2%}".format(totalInvalidGrantReqDatePerc),
