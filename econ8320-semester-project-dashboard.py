@@ -295,7 +295,7 @@ elif selected == "Last Year - Overview":
     by_columns = ['Patient ID#','Request Status','Application Signed?']
     df = data_c[data_c['Grant Req Date'].dt.year == (year)][by_columns].drop_duplicates()
     totalRequests = len(df)
-    custom_header(text="Patient Approval ", size=25, color='#788479',align='center', icon=None)
+    custom_header(text="Patient Approval ", size=25, color='#386d06',align='center', icon=None)
 
     show_by_breakdown = st.checkbox('Break by Application Signed Status',value=False)
     if show_by_breakdown:
@@ -340,7 +340,7 @@ elif selected == "Last Year - Overview":
     by_columns = ['Type of Assistance (CLASS)','Race','Gender','Amount']
     df = data_c[(data_c['Amount'] > 0) & (data_c['Payment Date'].dt.year == year)][by_columns]
     total_paid = df['Amount'].sum().round(2)
-    custom_header(text="Amount Paid", size=25, color='#788479', align='center', icon=None)
+    custom_header(text="Amount Paid", size=25, color='#386d06', align='center', icon=None)
     
     # Checkbox to filter
     show_by_total_paid = st.checkbox('Breakdown by Demography',value=False)
@@ -467,7 +467,7 @@ elif selected == "Demographics":
 
 
     #Create a page showing how long it takes between when we receive a patient request and actually send support.
-    custom_header(text="Approval to Payment Duration",size=25, color='#788479',align='center', icon=None)
+    custom_header(text="Approval to Payment Duration",size=25, color='#386d06',align='center', icon=None)
 
     # Checkbox to filter
     show_by_pay_dur = st.checkbox('Break by Demographics',value=False)
@@ -487,14 +487,14 @@ elif selected == "Demographics":
 
     #Create a page showing how many patients did not use their full grant amount in a given application year. 
     
-    custom_header(text="Unused Funds Per Patients By Application Year",size=25, color='#788479',align='center', icon=None)
+    custom_header(text="Unused Funds Per Patients By Application Year",size=25, color='#386d06',align='center', icon=None)
     by_columns = ['App Year']
     df = data_c[data_c['Remaining Balance'] > 0].groupby(by_columns)['App Year'].size().sort_values(ascending=False).reset_index(name='# of Accounts')
     st.dataframe(df)
 
     #What are the average amounts given by assistance type? This would help us in terms of budgeting and determining future programming needs.
     # Checkbox to filter
-    custom_header(text="Total Amount Paid by Assistance Type",size=25, color='#788479',align='center', icon=None)
+    custom_header(text="Total Amount Paid by Assistance Type",size=25, color='#386d06',align='center', icon=None)
     show_by_appyear = st.checkbox('Break by AppYear',value=False)
     if show_by_appyear:
         by_columns = ['Type of Assistance (CLASS)','App Year']
