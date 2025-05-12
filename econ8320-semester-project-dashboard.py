@@ -399,7 +399,7 @@ elif selected == "Request Status":
     filtered_df = df[df['Application Signed?'] == selected_category]
 
     # Display the filtered DataFrame
-    st.dataframe(filtered_df.reset_index(drop=True),height=1000)
+    st.dataframe(filtered_df.reset_index(drop=True),height=400)
 
 #------------------------------------------------------------#    
 #                         REPORT MISSING DATA                #
