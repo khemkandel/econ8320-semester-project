@@ -443,13 +443,6 @@ elif selected == "Data Quality":
             'Payment Submitted?',
             'Application Signed (Approved only)'
         ],
-        'Total Recs': [
-            totalGrantReqDate,
-            totalRemaingBalance,
-            totalRequestStatus,
-            totalPaymentDate,
-            totalApplicationSigned
-        ],
         'Total Invalid Recs': [
             totalInvalidGrantReqDate,
             totalInvalidRemaingBalance,
