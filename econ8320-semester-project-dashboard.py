@@ -178,7 +178,7 @@ with st.sidebar:
     selected = option_menu(
     menu_title = "Hope Foundation",
     options = ["Overview","Last Year - Overview", "Request Status", "Funds Distributions","Demographics", "Data Quality"],
-    icons = ["house","rewind","activity","Population","	Validation/Test"],
+    icons = ["house","rewind","activity","Notepad","Population","Validation/Test"],
     menu_icon = "cast",
     default_index = 0,
     #orientation = "horizontal",
