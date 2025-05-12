@@ -406,33 +406,56 @@ elif selected == "Request Status":
 #------------------------------------------------------------#
 elif selected == "Data Quality":
 
-
+    totalGrantReqDate = data_c['Grant Req Date'].count()
     totalInvalidGrantReqDate = pd.to_datetime(data_c['Grant Req Date'], errors='coerce').isna().sum()
+    totalInvalidGrantReqDatePerc = round(float(totalInvalidGrantReqDate / totalGrantReqDate), 2) if totalGrantReqDate > 0 else 0.0
+
+    
+    totalRemaingBalance = data_c['Remaining Balance'].count()
     totalInvalidRemaingBalance = ((data_c['Remaining Balance'] < 0) | (data_c['Remaining Balance'].isna())).sum()
+    totalInvalidRemaingBalancePerc = round(float(totalInvalidRemaingBalance / totalRemaingBalance), 2) if totalRemaingBalance > 0 else 0.0
 
     allowed_statuses = ['Approved', 'Pending', 'Denied']
+    totalRequestStatus = data_c['Request Status'].count()
     totalInvalidRequestStatus = (~data_c['Request Status'].isin(allowed_statuses)).sum()
+    totalInvalidRequestStatusPerc = round(float(totalInvalidRequestStatus / totalRequestStatus), 2) if totalRequestStatus > 0 else 0.0
+
+
+    totalPaymentDate =  data_o['Payment Submitted?'].count()
     totalInvalidPaymentDate =  data_o['Payment Submitted?'].str.lower().eq('yes').sum()
+    totalInvalidPaymentDatePerc = round(float(totalInvalidRequestStatus / totalInvalidPaymentDate), 2) if totalPaymentDate > 0 else 0.0
+
+
+
+    totalApplicationSigned = data_c['Application Signed?'].count()
     totalMissingApplicationSigned = (
         data_c['Application Signed?'].str.lower().eq('missing') &
         data_c['Request Status'].str.lower().eq('approved')
     ).sum()
+    totalMissingApplicationSignedPerc = round(float(totalMissingApplicationSigned / totalApplicationSigned), 2) if totalApplicationSigned > 0 else 0.0
 
     # Create summary table
     summary_df = pd.DataFrame({
-        'Check': [
-            'Invalid Grant Req Date',
-            'Invalid Remaining Balance',
-            'Invalid Request Status',
-            'Invalid Payment Submitted?',
-            'Missing Application Signed (Approved only)'
+        'Row IDs': [
+            'Grant Req Date',
+            'Remaining Balance',
+            'Request Status',
+            'Payment Submitted?',
+            'Application Signed (Approved only)'
         ],
-        'Count': [
+        'Total Invalid Recs': [
             totalInvalidGrantReqDate,
             totalInvalidRemaingBalance,
             totalInvalidRequestStatus,
             totalInvalidPaymentDate,
             totalMissingApplicationSigned
+        ],
+        'Invalid Records %': [
+            totalInvalidGrantReqDatePerc,
+            totalInvalidRemaingBalancePerc,
+            totalInvalidRequestStatusPerc,
+            totalInvalidPaymentDatePerc,
+            totalMissingApplicationSignedPerc
         ]
     })
 
