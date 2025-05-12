@@ -459,8 +459,8 @@ elif selected == "Data Quality":
 #   income size, insurance type, age, etc".                                             #
 #   In other words, break out how much support is offered by the listed demographics.   #
 #---------------------------------------------------------------------------------------#
-elif selected == "Funds Distribution":  
-    custom_header(text="Funds Distribution",align='center',size=35,color='#94cd5f')
+elif selected == "Funds Distributions":  
+    custom_header(text="Funds Distributions",align='center',size=35,color='#94cd5f')
     #Create a page showing how long it takes between when we receive a patient request and actually send support.
     custom_header(text="Approval to Payment Duration",size=25, color='#386d06',align='center', icon=None)
 
