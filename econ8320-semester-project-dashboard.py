@@ -578,11 +578,17 @@ elif selected == "Demographics":
         df_filtered_demography = df[df[selected_category] == selected_sub_category].groupby(df_columns_groupby)['Amount'].sum().sort_values(ascending=False)
         #st.write("selected_category  is " + str(selected_category) + "selected_sub_category" + str(selected_sub_category))
         st.dataframe(df_filtered_demography)
-        
         df_columns = ['Patient ID#',selected_category,'Total Household Gross Monthly Income']
         df = subset_df(df=data_c, column=selected_category,condition=selected_sub_category,op='==')[df_columns] 
         df = df[df_columns].groupby(df_columns)['Patient ID#'].count().sort_values(ascending=False).reset_index(name='Total Application Requests')
-        fig = px.box(df, y='Total Household Gross Monthly Income')
-        st.plotly_chart(fig)
+
+        col1,col2 = st.columns(2)    
+        with col1:
+            fig = px.box(df, y='Total Household Gross Monthly Income')
+            st.plotly_chart(fig)
+
+        with col2:
+            st.dataframe(df)
+
 else:
    st.write("The END")
