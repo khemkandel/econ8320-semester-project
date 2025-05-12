@@ -212,9 +212,9 @@ if selected == "Overview":
         df['Year1'] = pd.to_datetime(df['Grant Req Date'], errors='coerce').dt.year + ( df['App Year'] - 1)
         df = df.groupby('Patient ID#').apply(replace_unknown_year).reset_index(drop=True)
         
-        by_columns = ['Payment Date', 'Amount']
-        by_columns = ['Payment Date','Grant Req Date', 'App Year','Amount']
-        df = [by_columns].copy()
+
+        by_columns = ['Year','Amount']
+        df = df[by_columns].copy()
 
 
         # # Extract year safely
