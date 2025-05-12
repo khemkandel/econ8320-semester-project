@@ -504,7 +504,8 @@ elif selected == "Demographics":
     df = data_c[data_c['Remaining Balance'] > 0].groupby(by_columns)['App Year'].size().sort_values(ascending=False).reset_index(name='# of Accounts')
 
     fig = px.pie(df, names='App Year', values='# of Accounts')
-    fig.update_layout(showlegend=True)
+    fig.update_layout(showlegend=True,
+                      legend_title_text='Application Year')  # Set legend title here)
     st.plotly_chart(fig)
     #st.dataframe(df)
 
