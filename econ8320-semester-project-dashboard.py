@@ -513,9 +513,9 @@ elif selected == "Demographics":
         df = data_c[data_c['Amount'] > 0].groupby(by_columns)['Amount'].sum().reset_index()
         fig = px.bar(
             df,
-            x='App Year',
+            x='Type of Assistance (CLASS)',
             y='Amount',
-            color='Type of Assistance (CLASS)',         # distinguishes bars side-by-side
+            color='App Year',         # distinguishes bars side-by-side
             barmode='group'                             # enables side-by-side bars
         )
         fig.update_layout(showlegend=True)
