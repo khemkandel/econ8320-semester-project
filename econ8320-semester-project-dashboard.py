@@ -516,6 +516,7 @@ elif selected == "Funds Distributions":
         #show_by_pay_dur = st.checkbox('Break by Demographics',value=False)
 
         with col1:
+                st.write(selected_year)
             #else:
                 df_columns = ['Race','Gender','Insurance Type','Grant Req Date','Payment Date','Year']
                 df = subset_df(df=data_c,column='Payment Date',condition='', op='notna')[df_columns] 
