@@ -373,7 +373,7 @@ elif selected == "Last Year - Overview":
 # Create a page showing all of the applications that are "ready for review", and                           #
 # can be filtered by whether or not the application has been signed by the necessary committee members.    #
 #----------------------------------------------------------------------------------------------------------#
-elif selected == "Request Status":
+elif selected == "Request Database":
 
 
     custom_header(text="Request Ready for Review ",align='center',size=35,color='#94cd5f')
