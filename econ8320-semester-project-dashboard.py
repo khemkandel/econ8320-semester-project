@@ -486,7 +486,7 @@ elif selected == "Funds Distributions":
         with col1:
             #if show_by_appyear:
                 by_columns = ['Type of Assistance (CLASS)','App Year']
-                df = data_c[(data_c['Amount'] > 0) & (data_c['Year'] == selected_year)].groupby(by_columns)['Amount'].sum().reset_index()
+                df = data_c[(data_c['Amount'] > 0) & (data_c['Year'].astype(int) == selected_year)].groupby(by_columns)['Amount'].sum().reset_index()
                 fig = px.bar(
                     df,
                     x='App Year',
@@ -502,7 +502,7 @@ elif selected == "Funds Distributions":
                 st.plotly_chart(fig, use_container_width=True)
         with col2:
                 by_columns = ['Type of Assistance (CLASS)']
-                df = data_c[(data_c['Amount'] > 0) & (data_c['Year'] == selected_year)].groupby(by_columns)['Amount'].sum().reset_index(name='Total Amount').sort_values(by='Total Amount', ascending=False)
+                df = data_c[(data_c['Amount'] > 0) & (data_c['Year'].astype(int) == selected_year)].groupby(by_columns)['Amount'].sum().reset_index(name='Total Amount').sort_values(by='Total Amount', ascending=False)
                 df = df.reset_index(drop=True)
                 st.dataframe(df)
 
@@ -560,7 +560,7 @@ elif selected == "Funds Distributions":
         #Create a page showing how many patients did not use their full grant amount in a given application year. 
         custom_header(text="Unused Funds Per Patients By Application Year",size=25, color='#386d06',align='center', icon=None)
         by_columns = ['App Year']
-        df = data_c[(data_c['Remaining Balance'] > 0) & (data_c['Year'] == selected_year)].groupby(by_columns)['App Year'].size().sort_values(ascending=False).reset_index(name='# of Accounts')
+        df = data_c[(data_c['Remaining Balance'] > 0) & (data_c['Year'].astype(int) == selected_year)].groupby(by_columns)['App Year'].size().sort_values(ascending=False).reset_index(name='# of Accounts')
         col1, col2 = st.columns(2)
         with col1:
             fig = px.pie(df, names='App Year', values='# of Accounts')
