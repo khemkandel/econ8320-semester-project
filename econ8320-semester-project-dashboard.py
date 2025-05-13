@@ -610,6 +610,8 @@ elif selected == "Demographic":
             df['Total Household Gross Monthly Income'] = pd.to_numeric(df['Total Household Gross Monthly Income'], errors='coerce')
             df['Total Household Gross Monthly Income'] = df['Total Household Gross Monthly Income'].round(2)
             df = df.sort_values(by='Total Household Gross Monthly Income',ascending=False)
+            # Format as string with two decimal places
+            df['Total Household Gross Monthly Income'] = df['Total Household Gross Monthly Income'].apply(lambda x: f"{x:.2f}")
             df = df.reset_index(drop=True)
             df = df.rename(columns={
                                 'Total Household Gross Monthly Income': 'Monthly Income'
