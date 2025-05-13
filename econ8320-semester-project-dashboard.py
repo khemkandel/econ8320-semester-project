@@ -514,7 +514,7 @@ elif selected == "Funds Distributions":
                 df_filtered_demography = df[df['DaysTillPaid'] >= 0]
                 # Categorize values over 30 days as "Over 30 Days"
                 #df_filtered_demography['DaysTillPaid'] = np.where(df_filtered_demography['DaysTillPaid'] > 30, 'Over 30 Days', df_filtered_demography['DaysTillPaid'])
-                df_filtered_demography = df_filtered_demography.groupby(df_columns)['DaysTillPaid'].count().sort_values(ascending=False).reset_index(name='Total Records')
+                df_filtered_demography = df_filtered_demography.groupby(df_columns)['DaysTillPaid'].count().sort_values(ascending=False).reset_index(name='Count')
                 #st.bar_chart(df_filtered_demography,x='DaysTillPaid',y='Count')
                 # Display the bar chart
                 #st.bar_chart(df_filtered_demography.set_index('DaysTillPaid'))
@@ -538,7 +538,7 @@ elif selected == "Funds Distributions":
                 df['DaysTillPaid']  =  (df['Payment Date'] - df['Grant Req Date']).dt.days
                 df_columns =  ['Race','Gender','Insurance Type','DaysTillPaid']
                 df = df[df_columns]
-                df_filtered_demography = df[df['DaysTillPaid'] >= 0].groupby(df_columns)['DaysTillPaid'].count().sort_values(ascending=False).reset_index(name='Count')
+                df_filtered_demography = df[df['DaysTillPaid'] >= 0].groupby(df_columns)['DaysTillPaid'].count().sort_values(ascending=False).reset_index(name='Total Records')
                 st.dataframe(df_filtered_demography)
 
 
