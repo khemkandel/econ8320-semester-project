@@ -177,7 +177,7 @@ st.markdown(
 with st.sidebar:
     selected = option_menu(
     menu_title = "Hope Foundation",
-    options = ["Overview","Last Year - Overview", "Funds Distributions","Demographics", "Request Database","Search","Data Quality"],
+    options = ["Overview","Last Year - Overview", "Funds Distributions","Demographics", "Request Database","Patient Search Page","Data Quality"],
         icons=["house", "rewind","file-earmark-text", "people", "activity","eyeglasses","clipboard-check"],
     menu_icon = "cast",
     default_index = 0
@@ -602,7 +602,7 @@ elif selected == "Demographics":
                                 
                             })
             st.dataframe(df)
-elif (selected == 'Search'):
+elif (selected == 'Patient Search Page'):
 
     custom_header(text="Patient Search Page",align='center',size=35,color='#94cd5f')
 
