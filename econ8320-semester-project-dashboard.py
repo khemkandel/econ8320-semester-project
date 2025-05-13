@@ -177,8 +177,8 @@ st.markdown(
 with st.sidebar:
     selected = option_menu(
     menu_title = "Hope Foundation",
-    options = ["Overview","Last Year - Overview", "Request Status", "Funds Distributions","Demographics", "Data Quality"],
-        icons=["house", "rewind", "activity","file-earmark-text", "people", "clipboard-check"],
+    options = ["Overview","Last Year - Overview", "Funds Distributions","Demographics", "Request Database","Search","Data Quality"],
+        icons=["house", "rewind","file-earmark-text", "people", "activity","eyeglasses","clipboard-check"],
     menu_icon = "cast",
     default_index = 0,
     #orientation = "horizontal",
@@ -603,6 +603,26 @@ elif selected == "Demographics":
                                 
                             })
             st.dataframe(df)
+elif (selected == 'Search'):
+
+    st.title('Patient Search Page')
+
+    # Column Selection
+    columns = data_c.columns.tolist()
+    selected_column = st.selectbox('Select Column to Search:', columns)
+
+    # Search Input
+    search_term = st.text_input(f'Search in {selected_column}').strip()
+
+    # Filter DataFrame
+    if search_term:
+        filtered_df = data_c[data_c[selected_column].astype(str).str.contains(search_term, case=False, na=False)]
+    else:
+        filtered_df = data_c
+
+    # Display Filtered Results
+    st.subheader('Search Results')
+    st.dataframe(filtered_df)
 
 else:
    st.write("The END")
