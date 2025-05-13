@@ -504,6 +504,7 @@ elif selected == "Funds Distributions":
         with col2:
                 by_columns = ['Type of Assistance (CLASS)']
                 df = data_c[(data_c['Amount'] > 0) & (data_c['Year'].astype(int) == selected_year)].groupby(by_columns)['Amount'].sum().reset_index(name='Total Amount').sort_values(by='Total Amount', ascending=False)
+                df['Amount'] = df['Amount'].apply(lambda x: f"{x:.2f}")
                 df = df.reset_index(drop=True)
                 st.dataframe(df)
 
@@ -589,7 +590,7 @@ elif selected == "Demographic":
         df_columns_groupby = [selected_category]
         df_columns_groupby = df_columns_groupby + list(set(df_columns_groupby).symmetric_difference(set(category_options)))
         df_filtered_demography = df[df[selected_category] == selected_sub_category].groupby(df_columns_groupby)['Amount'].sum().sort_values(ascending=False).reset_index(name='Amount')
-        df_filtered_demography['Amount'] = df['Amount'].apply(lambda x: f"{x:.2f}")
+        df_filtered_demography['Amount'] = df_filtered_demography['Amount'].apply(lambda x: f"{x:.2f}")
         df_filtered_demography = df_filtered_demography.rename(columns={
                                                                 'Amount': 'Amount Paid'
                                                                })
