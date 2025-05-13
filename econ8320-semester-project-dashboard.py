@@ -509,7 +509,7 @@ elif selected == "Funds Distributions":
             #else:
                 df_columns = ['Race','Gender','Insurance Type','Grant Req Date','Payment Date']
                 df = subset_df(df=data_c,column='Payment Date',condition='', op='notna')[df_columns] 
-                df = df[df['Grant Req Date'].dt.year == selected_year]
+                #df = df[df['Grant Req Date'].dt.year == selected_year]
                 df['DaysTillPaid']  =  (df['Payment Date'] - df['Grant Req Date']).dt.days
                 df_columns = ['DaysTillPaid']
                 df = df[df_columns]
