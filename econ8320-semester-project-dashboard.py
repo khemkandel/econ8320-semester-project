@@ -462,7 +462,8 @@ elif selected == "Funds Distributions":
     custom_header(text="Funds Distributions",align='center',size=35,color='#94cd5f')
     # Column Selection
     years =  data_c['Grant Req Date'].dt.year.unique().tolist()
-    selected_year = st.selectbox('Select Year to Search:', years)
+    years = years.sort(reverse=True)
+    selected_year = st.selectbox('Select Year to Search:', years,0)
 
     # Extract year safely
     data_c['Year'] = pd.to_datetime(data_c['Payment Date'], errors='coerce').dt.year
