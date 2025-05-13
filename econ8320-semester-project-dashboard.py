@@ -604,7 +604,7 @@ elif selected == "Demographics":
             st.dataframe(df)
 elif (selected == 'Search'):
 
-    st.title('Patient Search Page')
+    custom_header(text="Patient Search Page",align='center',size=35,color='#94cd5f')
 
     # Column Selection
     columns = data_c.columns.tolist()
@@ -621,7 +621,7 @@ elif (selected == 'Search'):
 
     # Display Filtered Results
     filtered_df['Grant Req Date'] = pd.to_datetime(filtered_df['Grant Req Date']).dt.strftime('%Y-%m-%d')
-    st.subheader('Search Results')
+    custom_header(text="Search Results",size=25, color='#386d06',align='center', icon=None)
     st.dataframe(filtered_df)
 
 else:
