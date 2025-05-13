@@ -177,7 +177,7 @@ st.markdown(
 with st.sidebar:
     selected = option_menu(
     menu_title = "Hope Foundation",
-    options = ["Overview","Last Year - Overview", "Funds Distributions","Demographics", "Request Database","Patient Search Page","Data Quality"],
+    options = ["Overview","Last Year - Overview", "Funds Distributions","Demographic", "Request Database","Patient Search Page","Data Quality"],
         icons=["house", "rewind","file-earmark-text", "people", "activity","eyeglasses","clipboard-check"],
     menu_icon = "cast",
     default_index = 0
@@ -572,10 +572,10 @@ elif selected == "Funds Distributions":
         with col2:
             st.dataframe(df)
 
-elif selected == "Demographics":  
+elif selected == "Demographic":  
     c1 = st.container()
     with c1:
-        custom_header(text="Demographics Information",align='center',size=35,color='#94cd5f')
+        custom_header(text="Demographic Information",align='center',size=35,color='#94cd5f')
         category_options = ['Race','Gender','Insurance Type']
         selected_category = st.selectbox("Select Demographic Category", category_options,index=0)
 
