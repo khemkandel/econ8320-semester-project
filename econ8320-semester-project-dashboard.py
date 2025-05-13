@@ -589,7 +589,7 @@ elif selected == "Demographic":
         df_columns_groupby = [selected_category]
         df_columns_groupby = df_columns_groupby + list(set(df_columns_groupby).symmetric_difference(set(category_options)))
         df_filtered_demography = df[df[selected_category] == selected_sub_category].groupby(df_columns_groupby)['Amount'].sum().sort_values(ascending=False).reset_index(name='Amount')
-        #st.write("selected_category  is " + str(selected_category) + "selected_sub_category" + str(selected_sub_category))
+        df_filtered_demography['Amount'] = df['Amount'].apply(lambda x: f"{x:.2f}")
         df_filtered_demography = df_filtered_demography.rename(columns={
                                                                 'Amount': 'Amount Paid'
                                                                })
@@ -599,6 +599,7 @@ elif selected == "Demographic":
         df_columns = ['Patient ID#',selected_category,'Total Household Gross Monthly Income']
         df = subset_df(df=data_c, column=selected_category,condition=selected_sub_category,op='==')[df_columns] 
         df = df[df_columns].groupby(df_columns)['Patient ID#'].count().sort_values(ascending=False).reset_index(name='Total Application Requests')
+
         col1,col2 = st.columns(2)    
         with col1:
             custom_header(text="Income Distribution",align='center',size=20,color='#94cd5f')
