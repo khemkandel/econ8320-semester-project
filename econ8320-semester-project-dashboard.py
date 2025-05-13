@@ -460,7 +460,9 @@ elif selected == "Data Quality":
 #---------------------------------------------------------------------------------------#
 elif selected == "Funds Distributions":  
     custom_header(text="Funds Distributions",align='center',size=35,color='#94cd5f')
-
+    # Column Selection
+    columns =  data_c['Grant Req Date'].dt.year.unique().tolist()
+    selected_column = st.selectbox('Select Year to Search:', columns)
 
     c = st.container()
     with c:
