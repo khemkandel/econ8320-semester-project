@@ -584,6 +584,7 @@ elif selected == "Demographics":
 
         col1,col2 = st.columns(2)    
         with col1:
+            custom_header(text="Income Distribution",align='center',size=20,color='#94cd5f')
             fig = px.box(df, y='Total Household Gross Monthly Income')
             st.plotly_chart(fig)
 
