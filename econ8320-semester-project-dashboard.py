@@ -582,15 +582,15 @@ elif selected == "Demographics":
         df = subset_df(df=data_c, column=selected_category,condition=selected_sub_category,op='==')[df_columns] 
         df = df[df_columns].groupby(df_columns)['Patient ID#'].count().sort_values(ascending=False).reset_index(name='Total Application Requests')
 
-        custom_header(text="Income Distribution",align='center',size=20,color='#94cd5f')
+
         col1,col2 = st.columns(2)    
         with col1:
-
+            custom_header(text="Income Distribution",align='center',size=20,color='#94cd5f')
             fig = px.box(df, y='Total Household Gross Monthly Income')
             st.plotly_chart(fig)
 
         with col2:
-            # Ensure the column is numeric
+            custom_header(text="Income Detail",align='center',size=20,color='#94cd5f')
             df['Total Household Gross Monthly Income'] = pd.to_numeric(df['Total Household Gross Monthly Income'], errors='coerce')
             df['Total Household Gross Monthly Income'] = df['Total Household Gross Monthly Income'].round(2)
             df = df.sort_values(by='Total Household Gross Monthly Income',ascending=False)
