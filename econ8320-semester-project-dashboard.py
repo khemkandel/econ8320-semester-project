@@ -620,7 +620,9 @@ elif (selected == 'Patient Search Page'):
         filtered_df = data_c
 
     # Display Filtered Results
+    
     filtered_df['Grant Req Date'] = pd.to_datetime(filtered_df['Grant Req Date']).dt.strftime('%Y-%m-%d')
+    filtered_df = filtered_df.reset_index(drop=True)
     custom_header(text="Search Results",size=20, color='#386d06',align='left', icon=None)
     st.dataframe(filtered_df)
 
