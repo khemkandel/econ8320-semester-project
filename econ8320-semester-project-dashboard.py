@@ -180,8 +180,7 @@ with st.sidebar:
     options = ["Overview","Last Year - Overview", "Funds Distributions","Demographics", "Request Database","Search","Data Quality"],
         icons=["house", "rewind","file-earmark-text", "people", "activity","eyeglasses","clipboard-check"],
     menu_icon = "cast",
-    default_index = 0,
-    #orientation = "horizontal",
+    default_index = 0
 )
 
 
