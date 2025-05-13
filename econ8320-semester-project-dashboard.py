@@ -463,7 +463,7 @@ elif selected == "Funds Distributions":
     # Column Selection
     years =  data_c['Grant Req Date'].dt.year.unique().tolist()
     years = years.sort(reverse=True)
-    selected_year = st.selectbox('Select Year to Search:', years,0)
+    selected_year = st.selectbox('Select Year to Search:', years,index=0)
 
     # Extract year safely
     data_c['Year'] = pd.to_datetime(data_c['Payment Date'], errors='coerce').dt.year
