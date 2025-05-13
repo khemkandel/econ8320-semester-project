@@ -621,7 +621,7 @@ elif (selected == 'Search'):
 
     # Display Filtered Results
     filtered_df['Grant Req Date'] = pd.to_datetime(filtered_df['Grant Req Date']).dt.strftime('%Y-%m-%d')
-    custom_header(text="Search Results",size=25, color='#386d06',align='center', icon=None)
+    custom_header(text="Search Results",size=20, color='#386d06',align='left', icon=None)
     st.dataframe(filtered_df)
 
 else:
