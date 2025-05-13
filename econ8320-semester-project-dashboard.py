@@ -461,8 +461,8 @@ elif selected == "Data Quality":
 elif selected == "Funds Distributions":  
     custom_header(text="Funds Distributions",align='center',size=35,color='#94cd5f')
     # Column Selection
-    columns =  data_c['Grant Req Date'].dt.year.unique().tolist()
-    selected_column = st.selectbox('Select Year to Search:', columns)
+    years =  data_c['Grant Req Date'].dt.year.unique().tolist()
+    selected_year = st.selectbox('Select Year to Search:', years)
 
     c = st.container()
     with c:
@@ -474,7 +474,7 @@ elif selected == "Funds Distributions":
         with col1:
             #if show_by_appyear:
                 by_columns = ['Type of Assistance (CLASS)','App Year']
-                df = data_c[(data_c['Amount'] > 0) & (data_c['Grant Req Date'].dt.year == selected)].groupby(by_columns)['Amount'].sum().reset_index()
+                df = data_c[(data_c['Amount'] > 0) & (data_c['Grant Req Date'].dt.year == selected_year)].groupby(by_columns)['Amount'].sum().reset_index()
                 fig = px.bar(
                     df,
                     x='App Year',
@@ -491,7 +491,7 @@ elif selected == "Funds Distributions":
         with col2:
             #else:
                 by_columns = ['Type of Assistance (CLASS)']
-                df = data_c[(data_c['Amount'] > 0) & (data_c['Grant Req Date'].dt.year == selected)].groupby(by_columns)['Amount'].sum().reset_index(name='Total Amount').sort_values(by='Total Amount', ascending=False)
+                df = data_c[(data_c['Amount'] > 0) & (data_c['Grant Req Date'].dt.year == selected_year)].groupby(by_columns)['Amount'].sum().reset_index(name='Total Amount').sort_values(by='Total Amount', ascending=False)
                 df = df.reset_index(drop=True)
                 #df = df.sort_values(by='Amount', ascending=False)
                 st.dataframe(df)
@@ -509,7 +509,7 @@ elif selected == "Funds Distributions":
             #else:
                 df_columns = ['Race','Gender','Insurance Type','Grant Req Date','Payment Date']
                 df = subset_df(df=data_c,column='Payment Date',condition='', op='notna')[df_columns] 
-                df = df[df['Grant Req Date'].dt.year == selected]
+                df = df[df['Grant Req Date'].dt.year == selected_year]
                 df['DaysTillPaid']  =  (df['Payment Date'] - df['Grant Req Date']).dt.days
                 df_columns = ['DaysTillPaid']
                 df = df[df_columns]
@@ -537,7 +537,7 @@ elif selected == "Funds Distributions":
             #if show_by_pay_dur:
                 df_columns = ['Race','Gender','Insurance Type','Grant Req Date','Payment Date']
                 df = subset_df(df=data_c,column='Payment Date',condition='', op='notna')[df_columns] 
-                df = df[df['Grant Req Date'].dt.year == selected]
+                df = df[df['Grant Req Date'].dt.year == selected_year]
                 df['DaysTillPaid']  =  (df['Payment Date'] - df['Grant Req Date']).dt.days
                 df_columns =  ['Race','Gender','Insurance Type','DaysTillPaid']
                 df = df[df_columns]
@@ -550,7 +550,7 @@ elif selected == "Funds Distributions":
         #Create a page showing how many patients did not use their full grant amount in a given application year. 
         custom_header(text="Unused Funds Per Patients By Application Year",size=25, color='#386d06',align='center', icon=None)
         by_columns = ['App Year']
-        df = data_c[(data_c['Remaining Balance'] > 0) & (data_c['Grant Req Date'].dt.year == selected)].groupby(by_columns)['App Year'].size().sort_values(ascending=False).reset_index(name='# of Accounts')
+        df = data_c[(data_c['Remaining Balance'] > 0) & (data_c['Grant Req Date'].dt.year == selected_year)].groupby(by_columns)['App Year'].size().sort_values(ascending=False).reset_index(name='# of Accounts')
         # df = (
         #     data_c[(data_c['Remaining Balance'] > 0) & (data_c['Grant Req Date'].dt.year == selected)]
         #     .groupby(by_columns)['App Year']
