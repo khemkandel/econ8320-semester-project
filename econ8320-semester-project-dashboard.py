@@ -620,6 +620,7 @@ elif (selected == 'Search'):
         filtered_df = data_c
 
     # Display Filtered Results
+    filtered_df['Grant Req Date'] = pd.to_datetime(filtered_df['Grant Req Date']).dt.strftime('%Y-%m-%d')
     st.subheader('Search Results')
     st.dataframe(filtered_df)
 
