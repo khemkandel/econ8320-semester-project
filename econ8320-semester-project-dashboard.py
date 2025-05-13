@@ -504,7 +504,7 @@ elif selected == "Funds Distributions":
         with col2:
                 by_columns = ['Type of Assistance (CLASS)']
                 df = data_c[(data_c['Amount'] > 0) & (data_c['Year'].astype(int) == selected_year)].groupby(by_columns)['Amount'].sum().reset_index(name='Total Amount').sort_values(by='Total Amount', ascending=False)
-                df['Amount'] = df['Amount'].apply(lambda x: f"{x:.2f}")
+                df['Total Amount'] = df['Total Amount'].apply(lambda x: f"{x:.2f}")
                 df = df.reset_index(drop=True)
                 st.dataframe(df)
 
