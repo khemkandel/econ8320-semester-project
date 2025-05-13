@@ -501,7 +501,6 @@ elif selected == "Funds Distributions":
                 fig.update_layout(showlegend=True)
                 st.plotly_chart(fig, use_container_width=True)
         with col2:
-            #else:
                 by_columns = ['Type of Assistance (CLASS)']
                 df = data_c[(data_c['Amount'] > 0) & (data_c['Year'] == selected_year)].groupby(by_columns)['Amount'].sum().reset_index(name='Total Amount').sort_values(by='Total Amount', ascending=False)
                 df = df.reset_index(drop=True)
