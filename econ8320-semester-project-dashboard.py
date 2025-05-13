@@ -577,10 +577,9 @@ elif selected == "Demographics":
         df_columns_groupby = df_columns_groupby + list(set(df_columns_groupby).symmetric_difference(set(category_options)))
         df_filtered_demography = df[df[selected_category] == selected_sub_category].groupby(df_columns_groupby)['Amount'].sum().sort_values(ascending=False)
         #st.write("selected_category  is " + str(selected_category) + "selected_sub_category" + str(selected_sub_category))
-        df_filtered_demography = df_filtered_demography.rename(columns={
-                    'Amount': 'Amount Paid'
-                    
-                })
+        # df_filtered_demography = df_filtered_demography.rename(columns={
+        #                                                         'Amount': 'Amount Paid'
+        #                                                        })
         st.dataframe(df_filtered_demography)
 
 
