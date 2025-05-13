@@ -504,7 +504,6 @@ elif selected == "Funds Distributions":
                 by_columns = ['Type of Assistance (CLASS)']
                 df = data_c[(data_c['Amount'] > 0) & (data_c['Year'] == selected_year)].groupby(by_columns)['Amount'].sum().reset_index(name='Total Amount').sort_values(by='Total Amount', ascending=False)
                 df = df.reset_index(drop=True)
-                #df = df.sort_values(by='Amount', ascending=False)
                 st.dataframe(df)
 
     c2 = st.container()
@@ -546,7 +545,7 @@ elif selected == "Funds Distributions":
 
         with col2:
             #if show_by_pay_dur:
-                df_columns = ['Race','Gender','Insurance Type','Grant Req Date','Payment Date']
+                df_columns = ['Race','Gender','Insurance Type','Grant Req Date','Payment Date','Year']
                 df = subset_df(df=data_c,column='Payment Date',condition='', op='notna')[df_columns] 
                 df = df[df['Year'] == selected_year]
                 df['DaysTillPaid']  =  (df['Payment Date'] - df['Grant Req Date']).dt.days
