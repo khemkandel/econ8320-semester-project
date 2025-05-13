@@ -244,6 +244,14 @@ class hopeFoundationCancerDatabase(object):
         df = self.clean_and_convert_to_float(df, 'Amount') 
         return df
 
+    # Function to replace 'unknown' Year with Year1 of the same patient where APP Year is 1
+    def replace_unknown_year(group):
+        # Get the Year1 value for APP Year == 1 for this patient
+        year1_value = group.loc[group['App Year'] == 1, 'Year1'].values
+        if len(year1_value) > 0:  # If there is a value
+            group.loc[(group['Year'] == 'unknown'), 'Year'] = year1_value[0]
+        return group
+
     def clean_datafile(self,df):
 
         # Convert Generic Values to Consistent Case
