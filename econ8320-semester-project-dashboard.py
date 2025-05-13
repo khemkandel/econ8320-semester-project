@@ -548,7 +548,7 @@ elif selected == "Funds Distributions":
                 df_columns = ['Race','Gender','Insurance Type','Grant Req Date','Payment Date','Year']
                 df = subset_df(df=data_c,column='Payment Date',condition='', op='notna')[df_columns] 
                 st.write(selected_year)
-                df = df[ str(df['Year']) == selected_year ]
+                df = df[ df['Year'].astype(int) == selected_year ]
                 st.dataframe(df)
                 # df['DaysTillPaid']  =  (df['Payment Date'] - df['Grant Req Date']).dt.days
                 # df_columns =  ['Race','Gender','Insurance Type','DaysTillPaid']
